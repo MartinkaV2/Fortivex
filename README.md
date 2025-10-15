@@ -1,1 +1,1 @@
-# Fortivex Project hivatalos Github oldala
+# Fortivex Project hivatalos GitHub oldala
