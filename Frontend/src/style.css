@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #f8fafc;
+  background-color: #0b1d3a;
+  line-height: 1.5;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus {
+  outline: none;
+}
+
+a:focus-visible {
+  outline: 2px solid rgba(253, 230, 138, 0.8);
+  outline-offset: 3px;
+}
