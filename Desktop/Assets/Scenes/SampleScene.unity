@@ -890,9 +890,9 @@ MonoBehaviour:
   range: 8
   damage: 25
   fireRate: 1
-  first: 0
+  first: 1
   last: 0
-  strong: 1
+  strong: 0
 --- !u!50 &785218177
 Rigidbody2D:
   serializedVersion: 5

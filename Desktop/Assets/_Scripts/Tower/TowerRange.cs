@@ -17,6 +17,18 @@ public class TowerRange : MonoBehaviour
         // Töröljük a null referenciákat (elpusztult enemy-k)
         targets.RemoveAll(t => t == null);
 
+        // Ha van jelenlegi target ÉS még él ÉS még benne van a range-ben, megtartjuk
+        if (Tower.target != null && targets.Contains(Tower.target))
+        {
+            Enemy currentEnemy = Tower.target.GetComponent<Enemy>();
+            if (currentEnemy != null && currentEnemy.health > 0)
+            {
+                // Megtartjuk a jelenlegi targetet, nem választunk újat
+                return;
+            }
+        }
+
+        // Ha nincs target VAGY meghalt VAGY kilépett a range-bõl, új targetet választunk
         if (targets.Count > 0)
         {
             if (Tower.first)
