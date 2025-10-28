@@ -19,7 +19,83 @@ public class TowerRange : MonoBehaviour
 
         if (targets.Count > 0)
         {
-            Tower.target = targets[0];
+            if (Tower.first)
+            {
+                // FIRST: Az enemy aki a legelöl van (legnagyobb checkpoint index)
+                float minDistance = Mathf.Infinity;
+                int maxIndex = -1;
+                GameObject firstTarget = null;
+
+                foreach (GameObject target in targets)
+                {
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    if (enemy == null) continue;
+
+                    int enemyIndex = enemy.index;
+                    float enemyDistance = enemy.distance;
+
+                    // Keressük a legnagyobb index-et, és ha egyenlõ akkor a legközelebb lévõt a következõ checkpoint-hoz
+                    if (enemyIndex > maxIndex || (enemyIndex == maxIndex && enemyDistance < minDistance))
+                    {
+                        maxIndex = enemyIndex;
+                        minDistance = enemyDistance;
+                        firstTarget = target;
+                    }
+                }
+
+                Tower.target = firstTarget;
+            }
+            else if (Tower.last)
+            {
+                // LAST: Az enemy aki a leghátul van (legkisebb checkpoint index)
+                float maxDistance = -1f;
+                int minIndex = int.MaxValue;
+                GameObject lastTarget = null;
+
+                foreach (GameObject target in targets)
+                {
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    if (enemy == null) continue;
+
+                    int enemyIndex = enemy.index;
+                    float enemyDistance = enemy.distance;
+
+                    // Keressük a legkisebb index-et, és ha egyenlõ akkor a legtávolabb lévõt a következõ checkpoint-tól
+                    if (enemyIndex < minIndex || (enemyIndex == minIndex && enemyDistance > maxDistance))
+                    {
+                        minIndex = enemyIndex;
+                        maxDistance = enemyDistance;
+                        lastTarget = target;
+                    }
+                }
+
+                Tower.target = lastTarget;
+            }
+            else if (Tower.strong)
+            {
+                // STRONG: Az enemy akinek a legtöbb HP-ja van
+                int maxHealth = -1;
+                GameObject strongTarget = null;
+
+                foreach (GameObject target in targets)
+                {
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    if (enemy == null) continue;
+
+                    if (enemy.health > maxHealth)
+                    {
+                        maxHealth = enemy.health;
+                        strongTarget = target;
+                    }
+                }
+
+                Tower.target = strongTarget;
+            }
+            else
+            {
+                // DEFAULT: Az elsõ enemy a listában
+                Tower.target = targets[0];
+            }
         }
         else
         {
@@ -29,15 +105,15 @@ public class TowerRange : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            targets.Add(collision.gameObject); // FIX: Add helyett Remove volt!
+            targets.Add(collision.gameObject);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             targets.Remove(collision.gameObject);
         }

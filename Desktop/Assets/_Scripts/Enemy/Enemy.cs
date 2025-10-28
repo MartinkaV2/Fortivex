@@ -1,17 +1,19 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private int health = 50;
+    public int health = 50;
     [SerializeField] private float movespeed = 2f;
 
     private Rigidbody2D rb;
 
     private Transform checkpoint;
 
-    private int index = 0;
+    [NonSerialized] public int index = 0;
+    [NonSerialized] public float distance = 0;
 
     private void Awake()
     {
@@ -20,6 +22,8 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         checkpoint = EnemyManager.main.checkpoints[index];
+        distance = Vector2.Distance(transform.position, EnemyManager.main.checkpoints[index].position); 
+
     }
 
     void Update()
