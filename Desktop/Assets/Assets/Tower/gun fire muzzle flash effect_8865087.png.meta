@@ -1,0 +1,416 @@
+fileFormatVersion: 2
+guid: 0d6f739690b00f542844e305f363de4c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5019459682747203766
+    second: gun fire muzzle flash effect_8865087_0
+  - first:
+      213: -4259501314649294698
+    second: gun fire muzzle flash effect_8865087_1
+  - first:
+      213: -4239554131550134993
+    second: gun fire muzzle flash effect_8865087_2
+  - first:
+      213: 7889131888728674620
+    second: gun fire muzzle flash effect_8865087_3
+  - first:
+      213: 6139735077615266705
+    second: gun fire muzzle flash effect_8865087_4
+  - first:
+      213: -5707315209848708779
+    second: gun fire muzzle flash effect_8865087_5
+  - first:
+      213: -4757040159637549921
+    second: gun fire muzzle flash effect_8865087_6
+  - first:
+      213: 2733281018573215772
+    second: gun fire muzzle flash effect_8865087_7
+  - first:
+      213: -8175872287072549464
+    second: gun fire muzzle flash effect_8865087_8
+  - first:
+      213: 7932411934483965319
+    second: gun fire muzzle flash effect_8865087_9
+  - first:
+      213: -8590096988136749297
+    second: gun fire muzzle flash effect_8865087_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_0
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 877
+        width: 2353
+        height: 1401
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4f3575430c475ab0800000000000000
+      internalID: -5019459682747203766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_1
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 2256
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 698f4044f1633e4c0800000000000000
+      internalID: -4259501314649294698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_2
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 1640
+        width: 21
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2d1aeebaf31a25c0800000000000000
+      internalID: -4239554131550134993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_3
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 1620
+        width: 21
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3111e587a3db7d60800000000000000
+      internalID: 7889131888728674620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_4
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 1591
+        width: 18
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19b634cf588b43550800000000000000
+      internalID: 6139735077615266705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_5
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 1594
+        width: 21
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 551a8c72e0b8bc0b0800000000000000
+      internalID: -5707315209848708779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_6
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 1581
+        width: 23
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9c498ebd299bfdb0800000000000000
+      internalID: -4757040159637549921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_7
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 1578
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c18df57da909ee520800000000000000
+      internalID: 2733281018573215772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_8
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 1553
+        width: 16
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a58418f877798e80800000000000000
+      internalID: -8175872287072549464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_9
+      rect:
+        serializedVersion: 2
+        x: 1002
+        y: 893
+        width: 30
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7856cfe60a6951e60800000000000000
+      internalID: 7932411934483965319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gun fire muzzle flash effect_8865087_10
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 894
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f07c4f33d48d9c880800000000000000
+      internalID: -8590096988136749297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      gun fire muzzle flash effect_8865087_0: -5019459682747203766
+      gun fire muzzle flash effect_8865087_1: -4259501314649294698
+      gun fire muzzle flash effect_8865087_10: -8590096988136749297
+      gun fire muzzle flash effect_8865087_2: -4239554131550134993
+      gun fire muzzle flash effect_8865087_3: 7889131888728674620
+      gun fire muzzle flash effect_8865087_4: 6139735077615266705
+      gun fire muzzle flash effect_8865087_5: -5707315209848708779
+      gun fire muzzle flash effect_8865087_6: -4757040159637549921
+      gun fire muzzle flash effect_8865087_7: 2733281018573215772
+      gun fire muzzle flash effect_8865087_8: -8175872287072549464
+      gun fire muzzle flash effect_8865087_9: 7932411934483965319
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
