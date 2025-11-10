@@ -705,6 +705,14 @@ async function fetchJson(path) {
     const res = await api.get(cleanPath)
     return res.data
   } catch (err) {
+    // Log detailed info to help diagnose intermittent network errors
+    console.error('API GET error', {
+      path,
+      message: err?.message,
+      status: err?.response?.status,
+      responseData: err?.response?.data,
+      config: err?.config
+    })
     const message = err?.response?.data || err?.message || String(err)
     throw new Error(message)
   }
@@ -718,6 +726,15 @@ async function postJson(path, payload) {
     const res = await api.post(cleanPath, payload)
     return res.data
   } catch (err) {
+    // Log detailed info to help diagnose intermittent network errors
+    console.error('API POST error', {
+      path,
+      payload,
+      message: err?.message,
+      status: err?.response?.status,
+      responseData: err?.response?.data,
+      config: err?.config
+    })
     const message = err?.response?.data || err?.message || String(err)
     throw new Error(message)
   }
@@ -775,7 +792,28 @@ async function handleLogin() {
       UserName: loginForm.identifier.trim(),
       PasswordHash: loginForm.password
     }
-    const res = await postJson('accounts/login', payload)
+    // Retry logic: on network/timeout errors retry a few times with backoff
+    const maxAttempts = 3
+    let attempt = 0
+    let lastError = null
+    let res = null
+    while (attempt < maxAttempts) {
+      attempt++
+      try {
+        res = await postJson('accounts/login', payload)
+        lastError = null
+        break
+      } catch (err) {
+        lastError = err
+        const msg = String(err?.message || '')
+        const isNetwork = msg.toLowerCase().includes('network') || msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('econnreset')
+        // If not a network/timeout issue, don't retry
+        if (!isNetwork || attempt >= maxAttempts) break
+        // small backoff before retrying
+        await new Promise(r => setTimeout(r, 200 * attempt))
+      }
+    }
+    if (lastError && !res) throw lastError
     // response may contain token or user object
     let token = null
     if (typeof res === 'string') token = res
