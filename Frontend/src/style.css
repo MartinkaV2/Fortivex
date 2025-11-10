@@ -1,25 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
+/*
+ * Általános stílusok
+ * A gyökérváltozókban állítjuk be az alap betűtípust és színt.
+ * A korábbi Fortivex dizájnhoz illeszkedően a háttér egy sötétkék → fekete átmenet.
+ */
 :root {
+  /* Alap betűkészlet */
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #f8fafc;
-  background-color: #0b1d3a;
+  /* Alap szövegszín halványan tört fehér */
+  color: #e6e8ec;
+  /* Soremelés */
   line-height: 1.5;
 }
 
+/* Háttér átmenet a teljes oldalra. A linear-gradient a sötétebb felső árnyalattól a mélyebb alsó színig tart. */
+html,
 body {
   min-height: 100vh;
+  background: linear-gradient(to bottom, #061427 0%, #040d1f 100%);
+  color: inherit;
 }
 
+/* Győződjünk meg arról, hogy az app konténerek kitöltik a rendelkezésre álló teret */
+body,
 #app {
   min-height: 100vh;
 }
 
+/* Linkek örököljék a színt */
 a {
   color: inherit;
 }
 
+/* Linkek fókuszállapotának finom stílusa */
 a:focus {
   outline: none;
 }
