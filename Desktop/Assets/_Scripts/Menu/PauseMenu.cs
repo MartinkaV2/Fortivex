@@ -4,19 +4,26 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject container;
+    private bool isPaused = false;
+
     void Update()
     {
-     if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            container.SetActive(true);
-            Time.timeScale = 0;
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
         }
     }
-    
+
     public void ResumeButton()
     {
-        container?.SetActive(false);
-        Time.timeScale = 1;
+        ResumeGame();
     }
 
     public void RestartButton()
@@ -27,6 +34,21 @@ public class PauseMenu : MonoBehaviour
 
     public void MainMenuButton()
     {
+        Time.timeScale = 1; // Fontos: állítsuk vissza az idõskálát
         SceneManager.LoadSceneAsync(0);
+    }
+
+    private void PauseGame()
+    {
+        isPaused = true;
+        container.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    private void ResumeGame()
+    {
+        isPaused = false;
+        container.SetActive(false);
+        Time.timeScale = 1;
     }
 }
