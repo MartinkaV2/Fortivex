@@ -12,6 +12,7 @@ namespace FortivexAPI.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<PlayerProgress> PlayerProgress { get; set; }
         public DbSet<PlayerStat> PlayerStats { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,13 @@ namespace FortivexAPI.Data
                 .WithOne(a => a.PlayerStat)
                 .HasForeignKey<PlayerStat>(p => p.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                .HasOne(p => p.Account)
+                .WithOne(a => a.User)
+                .HasForeignKey<User>(p => p.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
             // --- SEED ADATOK ---
             modelBuilder.Entity<Account>().HasData(
@@ -112,6 +120,35 @@ namespace FortivexAPI.Data
                     TimePlayed = 5400
                 }
             );
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    AccountId = 1,
+                    Username = "testplayer",
+                    PasswordHash = "test123",
+                    Email = "test@gmail.com",
+                    Role = "user"
+                },
+                new User
+                {
+                    Id = 2,
+                    AccountId = 2,
+                    Username = "adminuser",
+                    PasswordHash = "admin123",
+                    Email = "adminus@gmail.com",
+                    Role = "admin"
+                },
+                new User
+                {
+                    Id = 3,
+                    AccountId = 3,
+                    Username = "player2",
+                    PasswordHash = "pass123",
+                    Email = "player2@gmail.com",
+                    Role = "user"
+                }
+                );
         }
     }
 }

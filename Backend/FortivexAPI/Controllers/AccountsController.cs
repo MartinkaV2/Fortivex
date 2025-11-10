@@ -3,6 +3,7 @@ using FortivexAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using FortivexAPI.Dtos;
 using Microsoft.EntityFrameworkCore;
+using FortivexAPI.Helpers;
 
 namespace FortivexAPI.Controllers
 {
@@ -11,10 +12,12 @@ namespace FortivexAPI.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly FortivexContext _context;
+        private readonly JwtHelper _jwt;
 
-        public AccountsController(FortivexContext context)
+        public AccountsController(FortivexContext context, JwtHelper jwt)
         {
             _context = context;
+            _jwt = jwt;
         }
 
         // GET: api/accounts
@@ -76,6 +79,7 @@ namespace FortivexAPI.Controllers
                 return NotFound();
 
             account.Username = dto.Username;
+            account.PasswordHash = dto.PasswordHash;
             account.Email = dto.Email;
             await _context.SaveChangesAsync();
 
@@ -95,5 +99,66 @@ namespace FortivexAPI.Controllers
 
             return NoContent();
         }
+        // ✅ LOGIN: POST /api/accounts/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
+        {
+            var account = await _context.Accounts
+                .FirstOrDefaultAsync(a => a.Username == dto.UserName && a.PasswordHash == dto.PasswordHash);
+
+            if (account == null)
+                return Unauthorized("Hibás felhasználónév vagy jelszó.");
+
+            // Szerepkör meghatározása
+            var isAdmin = await _context.Admins.AnyAsync(a => a.AccountId == account.Id);
+            var role = isAdmin ? "admin" : "user";
+
+            // JWT token generálás
+            var token = _jwt.GenerateToken(account.Username, role);
+
+            return Ok(new
+            {
+                token,
+                role,
+                username = account.Username
+            });
+        }
+
+
+        // ✅ REGISTER: POST /api/accounts/register
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
+        {
+            if (await _context.Accounts.AnyAsync(a => a.Username == dto.UserName))
+                return BadRequest("A felhasználónév már foglalt.");
+
+            var account = new Account
+            {
+                Username = dto.UserName,
+                PasswordHash = dto.PasswordHash,
+                Email = dto.Email,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+
+            // Ha szerepe admin, itt adjuk hozzá az admins táblába
+            if (dto.Role.ToLower() == "admin")
+            {
+                _context.Admins.Add(new Admin
+                {
+                    AccountId = account.Id,
+                    Role = "admin",
+                    AssignedAt = DateTime.Now
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok("Sikeres regisztráció!");
+        }
+
+
+
     }
 }

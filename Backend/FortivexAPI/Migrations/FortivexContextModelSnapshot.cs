@@ -53,27 +53,27 @@ namespace FortivexAPI.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 10, 16, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5544),
+                            CreatedAt = new DateTime(2025, 10, 27, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(93),
                             Email = "test@fortivex.com",
-                            LastLogin = new DateTime(2025, 10, 26, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5547),
+                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(97),
                             PasswordHash = "test123",
                             Username = "testplayer"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 10, 6, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5551),
+                            CreatedAt = new DateTime(2025, 10, 17, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(104),
                             Email = "admin@fortivex.com",
-                            LastLogin = new DateTime(2025, 10, 26, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5552),
+                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(106),
                             PasswordHash = "admin123",
                             Username = "adminuser"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 10, 21, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5555),
+                            CreatedAt = new DateTime(2025, 11, 1, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(111),
                             Email = "player2@fortivex.com",
-                            LastLogin = new DateTime(2025, 10, 26, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5556),
+                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(113),
                             PasswordHash = "pass123",
                             Username = "player2"
                         });
@@ -107,7 +107,7 @@ namespace FortivexAPI.Migrations
                         {
                             Id = 1,
                             AccountId = 2,
-                            AssignedAt = new DateTime(2025, 10, 11, 5, 56, 32, 918, DateTimeKind.Local).AddTicks(5672),
+                            AssignedAt = new DateTime(2025, 10, 22, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(497),
                             Role = "Admin"
                         });
                 });

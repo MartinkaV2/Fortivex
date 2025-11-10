@@ -11,6 +11,7 @@
 
         public Admin? Admin { get; set; }
         public PlayerProgress? PlayerProgress { get; set; }
-        public PlayerStat? PlayerStat { get; set; }
+        public PlayerStat? PlayerStat { get; set; } 
+        public User? User { get; set; }
     }
 }
