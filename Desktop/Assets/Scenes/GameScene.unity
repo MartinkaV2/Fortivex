@@ -6415,6 +6415,9 @@ MonoBehaviour:
   pistolTower: {fileID: 6643339489111774676, guid: 5f59aeb8098866942839d6497d5be87b, type: 3}
   sniperTower: {fileID: 2367685273229221705, guid: 367f03545baf0d845a5434405007e018, type: 3}
   bombaCannon: {fileID: 4336415043392883858, guid: 1b9436bb0e4231046b8db840dd7b5590, type: 3}
+  towerLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1831396498
 GameObject:
   m_ObjectHideFlags: 0

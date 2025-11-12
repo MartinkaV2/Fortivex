@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 2038600934381028355}
   - component: {fileID: 4404063439293290646}
   - component: {fileID: 818308411954042334}
+  - component: {fileID: 5922142906179217150}
   m_Layer: 0
   m_Name: Range
   m_TagString: Untagged
@@ -231,6 +232,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerRange
   Tower: {fileID: 9085957491880852032}
+--- !u!114 &5922142906179217150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5755635752704348895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37e665f289f683e479dab69354033719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerUpgrade
+  levels:
+  - range: 8
+    damage: 20
+    fireRate: 1
+  - range: 8
+    damage: 25
+    fireRate: 1
+  - range: 8
+    damage: 25
+    fireRate: 1
+  towerRange: {fileID: 818308411954042334}
 --- !u!1 &6643339489111774676
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +269,7 @@ GameObject:
   - component: {fileID: 4165478401978733998}
   - component: {fileID: 9085957491880852032}
   - component: {fileID: 4962466763792935018}
+  - component: {fileID: 1875405967297629760}
   m_Layer: 0
   m_Name: Pistol Tower
   m_TagString: Tower
@@ -316,7 +341,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 0.0047169924, b: 0.0047169924, a: 1}
   m_FlipX: 0
@@ -426,6 +451,19 @@ MonoBehaviour:
   rangeCollider: {fileID: 4404063439293290646}
   gray: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 0.46666667}
   red: {r: 1, g: 0, b: 0, a: 0.44313726}
+--- !u!114 &1875405967297629760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6643339489111774676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a544ca9f5f721458c4ba4203fd902a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerSelection
+  rangeSprite: {fileID: 2038600934381028355}
 --- !u!1 &8730596483192075041
 GameObject:
   m_ObjectHideFlags: 0

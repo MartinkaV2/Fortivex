@@ -7,6 +7,9 @@ public class TowerManager : MonoBehaviour
     [SerializeField] private GameObject sniperTower;
     [SerializeField] private GameObject bombaCannon;
 
+    [SerializeField] private LayerMask towerLayer;
+
+    private GameObject selectedTower;
     private GameObject placingTower;
 
     void Update()
@@ -34,6 +37,31 @@ public class TowerManager : MonoBehaviour
             {
                 placingTower = null;
             }
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition),Vector2.zero,100f,towerLayer);
+        
+            if (hit.collider != null)
+            {
+                if (selectedTower )
+                {
+                    GameObject range1 = selectedTower.transform.GetChild(1).gameObject;
+
+                    range1.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
+                selectedTower= hit.collider.gameObject;
+
+                GameObject range2 = selectedTower.transform.GetChild(1).gameObject;
+
+                range2.GetComponent<SpriteRenderer>().enabled = true;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.U) && selectedTower)
+        { 
+        selectedTower.GetComponent <TowerUpgrade>().Upgrade();
         }
     }
 
