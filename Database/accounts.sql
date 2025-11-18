@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 09. 22:30
+-- Létrehozás ideje: 2025. Nov 17. 09:27
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.0.30
 
@@ -41,10 +41,13 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`Id`, `Username`, `PasswordHash`, `Email`, `CreatedAt`, `LastLogin`) VALUES
-(1, 'testplayer', 'test123', 'test@fortivex.com', '2025-10-27 20:06:44.567009', '2025-11-06 20:06:44.567009'),
-(2, 'adminuser', 'admin123', 'admin@fortivex.com', '2025-10-17 20:06:44.567010', '2025-11-06 20:06:44.567010'),
-(3, 'player2', 'pass123', 'player2@fortivex.com', '2025-11-01 20:06:44.567011', '2025-11-06 20:06:44.567011'),
-(4, 'zsooombi', 'test123', 'zsombika69@gmail.com', '2025-11-09 18:04:29.541095', NULL);
+(1, 'testplayer', 'test123', 'test@fortivex.com', '2025-11-04 10:13:33.000000', '2025-11-14 10:13:33.000000'),
+(2, 'adminuser', 'admin123', 'admin@fortivex.com', '2025-10-25 10:13:33.000000', '2025-11-14 10:13:33.000000'),
+(4, 'GretaThunberg', 'HOWDAREYOU', 'mergesvagyokamuanyagdildora@gmail.com', '2025-11-14 11:14:30.560912', NULL),
+(5, 'patrik', 'bigpatrik1', 'groszpatrik@gmail.com', '2025-11-14 12:29:26.310180', NULL),
+(6, 'MartinkaaMedvecz', 'ADSIONGOESBRR', 'ElgazolomaRedaitegySionRrel@gmail.com', '2025-11-17 08:17:07.201320', NULL),
+(7, 'hetvegeazmi', 'projektezzunk69', 'projektmunka@yahoo.mail', '2025-11-17 08:27:24.786343', NULL),
+(8, 'KovacsBenceazUltimateKelcsy', 'projektezniminek', 'Nemvagyokfogykos@yahoo.mail.com', '2025-11-17 08:29:49.237979', NULL);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -65,7 +68,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT a táblához `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
