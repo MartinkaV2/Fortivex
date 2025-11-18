@@ -1,60 +1,100 @@
 ﻿using UnityEngine;
-using System.Linq;
 
+/// <summary>
+/// Melee unit automatic target detection + facing + attack trigger.
+/// If target has AttackRanged component, melee unit will use extended detection range
+/// so it will try to chase and hit ranged enemies as well.
+/// </summary>
+[RequireComponent(typeof(AttackMelee))]
 public class MeleeAutoAttack : MonoBehaviour
 {
+    [Tooltip("Default detection radius for melee enemies")]
     public float detectionRange = 1.5f;
+
+    [Tooltip("Extra radius added when the potential target is a ranged unit")]
+    public float extraRangeAgainstRanged = 2.0f;
+
+    [Tooltip("Layer(s) that represent enemy units")]
     public LayerMask enemyLayer;
+
     private AttackMelee attack;
     private SpriteRenderer spriteRenderer;
 
     void Start()
     {
         attack = GetComponent<AttackMelee>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // vagy saját referenciát adj meg
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, detectionRange, enemyLayer);
-        if (hits.Length > 0)
+        float maxCheckRange = detectionRange + Mathf.Max(0f, extraRangeAgainstRanged);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, maxCheckRange, enemyLayer);
+
+        if (hits == null || hits.Length == 0)
+            return;
+
+        Transform chosen = null;
+        float bestDist = float.MaxValue;
+
+        // First pass: closest enemy within normal detection range
+        foreach (var h in hits)
         {
-            var target = hits
-                .Select(h => h.transform)
-                .OrderBy(t => Vector2.Distance(transform.position, t.position))
-                .First();
+            float d = Vector2.Distance(transform.position, h.transform.position);
+            if (d <= detectionRange && d < bestDist)
+            {
+                bestDist = d;
+                chosen = h.transform;
+            }
+        }
 
-            // 👉 Irányváltás
-            FaceTarget(target);
+        // Second pass: if no close enemy, pick ranged enemy in extended range
+        if (chosen == null)
+        {
+            foreach (var h in hits)
+            {
+                float d = Vector2.Distance(transform.position, h.transform.position);
+                if (d <= maxCheckRange)
+                {
+                    var ranged = h.GetComponent<AttackRanged>();
+                    if (ranged != null && d < bestDist)
+                    {
+                        bestDist = d;
+                        chosen = h.transform;
+                    }
+                }
+            }
+        }
 
-            if (attack != null)
-                attack.TryAttack(target);
+        if (chosen != null)
+        {
+            FaceTarget(chosen.position);
+
+            // **IMPORTANT FIX** – use cooldown-controlled TryAttack, not Fire!
+            attack.TryAttack(chosen);
         }
     }
 
-    void FaceTarget(Transform target)
+    private void FaceTarget(Vector3 targetPos)
     {
-        if (target == null) return;
+        if (spriteRenderer == null) return;
 
-        float direction = target.position.x - transform.position.x;
+        float direction = targetPos.x - transform.position.x;
+        if (Mathf.Approximately(direction, 0f)) return;
 
-        // Ha spriteRenderer van
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.flipX = direction < 0;
-        }
-        else
-        {
-            // Vagy ha a sprite scale alapján fordul
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * (direction < 0 ? -1 : 1);
-            transform.localScale = scale;
-        }
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (direction < 0 ? -1 : 1);
+        transform.localScale = scale;
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange + extraRangeAgainstRanged);
     }
 }
