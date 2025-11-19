@@ -1,24 +1,24 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Melee unit automatic target detection + facing + attack trigger.
-/// If target has AttackRanged component, melee unit will use extended detection range
-/// so it will try to chase and hit ranged enemies as well.
+/// Melee unit automatic target detection + movement + facing + attack trigger.
+/// Supports extended detection for ranged enemies.
 /// </summary>
 [RequireComponent(typeof(AttackMelee))]
 public class MeleeAutoAttack : MonoBehaviour
 {
-    [Tooltip("Default detection radius for melee enemies")]
-    public float detectionRange = 1.5f;
+    [Header("Ranges")]
+    public float detectionRange = 1.5f;              // normál látótáv
+    public float extraRangeAgainstRanged = 2.0f;     // ranged enemy ellen több
+    public float attackRange = 1.0f;                 // milyen közel kell lenni az ütéshez
 
-    [Tooltip("Extra radius added when the potential target is a ranged unit")]
-    public float extraRangeAgainstRanged = 2.0f;
-
-    [Tooltip("Layer(s) that represent enemy units")]
+    [Header("Movement")]
+    public float moveSpeed = 2f;                     // egység sebessége
     public LayerMask enemyLayer;
 
     private AttackMelee attack;
     private SpriteRenderer spriteRenderer;
+    private Transform currentTarget;
 
     void Start()
     {
@@ -30,50 +30,79 @@ public class MeleeAutoAttack : MonoBehaviour
 
     void Update()
     {
-        float maxCheckRange = detectionRange + Mathf.Max(0f, extraRangeAgainstRanged);
+        FindTarget();
+        MoveAndAttack();
+    }
+
+    private void FindTarget()
+    {
+        float maxCheckRange = detectionRange + extraRangeAgainstRanged;
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, maxCheckRange, enemyLayer);
 
-        if (hits == null || hits.Length == 0)
+        if (hits.Length == 0)
+        {
+            currentTarget = null;
             return;
+        }
 
-        Transform chosen = null;
         float bestDist = float.MaxValue;
+        Transform bestTarget = null;
 
-        // First pass: closest enemy within normal detection range
+        // 1. első kör: normál detection range-en belül a legközelebbi
         foreach (var h in hits)
         {
             float d = Vector2.Distance(transform.position, h.transform.position);
             if (d <= detectionRange && d < bestDist)
             {
                 bestDist = d;
-                chosen = h.transform;
+                bestTarget = h.transform;
             }
         }
 
-        // Second pass: if no close enemy, pick ranged enemy in extended range
-        if (chosen == null)
+        // 2. ha nincs melee range-en belül, nézz ranged ellenfelet extended range-ben
+        if (bestTarget == null)
         {
             foreach (var h in hits)
             {
                 float d = Vector2.Distance(transform.position, h.transform.position);
+
                 if (d <= maxCheckRange)
                 {
-                    var ranged = h.GetComponent<AttackRanged>();
-                    if (ranged != null && d < bestDist)
+                    if (h.GetComponent<AttackRanged>() != null)
                     {
-                        bestDist = d;
-                        chosen = h.transform;
+                        if (d < bestDist)
+                        {
+                            bestDist = d;
+                            bestTarget = h.transform;
+                        }
                     }
                 }
             }
         }
 
-        if (chosen != null)
-        {
-            FaceTarget(chosen.position);
+        currentTarget = bestTarget;
+    }
 
-            // **IMPORTANT FIX** – use cooldown-controlled TryAttack, not Fire!
-            attack.TryAttack(chosen);
+    private void MoveAndAttack()
+    {
+        if (currentTarget == null)
+            return;
+
+        // Sprite nézzen cél felé
+        FaceTarget(currentTarget.position);
+
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
+
+        if (distance > attackRange)
+        {
+            // 🔹 TÁMADÁSI TÁVON KÍVÜL → LÉPJEN ODA
+            Vector3 dir = (currentTarget.position - transform.position).normalized;
+            transform.position += dir * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            // 🔹 ELÉG KÖZEL → TAMADÁS
+            attack.TryAttack(currentTarget);
         }
     }
 
@@ -96,5 +125,8 @@ public class MeleeAutoAttack : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange + extraRangeAgainstRanged);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
