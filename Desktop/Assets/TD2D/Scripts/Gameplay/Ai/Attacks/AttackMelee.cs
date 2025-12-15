@@ -36,14 +36,19 @@ public class AttackMelee : Attack
 	/// Attack the specified target if cooldown expired
 	/// </summary>
 	/// <param name="target">Target.</param>
-	public override void TryAttack(Transform target)
-	{
-		if (cooldownCounter >= cooldown)
-		{
-			cooldownCounter = 0f;
-			Fire(target);
-		}
-	}
+public override void TryAttack(Transform target)
+{
+    DamageTaker myHp = GetComponentInParent<DamageTaker>();
+    if (myHp == null || myHp.currentHitpoints <= 0)
+        return; // halott egység nem támad
+
+    if (cooldownCounter >= cooldown)
+    {
+        cooldownCounter = 0f;
+        Fire(target);
+    }
+}
+
 
 	private IEnumerator FireCoroutine(Transform target)
 	{
