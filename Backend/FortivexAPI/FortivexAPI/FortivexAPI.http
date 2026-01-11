@@ -1,6 +1,0 @@
-@FortivexAPI_HostAddress = http://localhost:5105
-
-GET {{FortivexAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
