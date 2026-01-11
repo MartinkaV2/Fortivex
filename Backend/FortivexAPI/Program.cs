@@ -1,115 +1,90 @@
-using FortivexAPI.Data;
+ï»¿using FortivexAPI.Data;
 using FortivexAPI.Helpers;
 using FortivexAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-internal class Program
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
 {
-    public static char[] Key { get; private set; }
-
-    private static void Main(string[] args)
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
-            });
-        });
-
-
-        // Service regisztrációk az app build elõtt
-        builder.Services.AddDbContext<FortivexContext>(options =>
-            options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")!));
-
-        // JWT konfiguráció - JAVÍTOTT VERZIÓ
-        builder.Services.AddScoped<UserService>();
-        builder.Services.AddScoped<JwtHelper>();
-
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header
-            });
-            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[]{}
-        }
+        policy
+            .SetIsOriginAllowed(origin => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
-        });
+});
 
-        // JWT kulcs ellenõrzése
-        var Key = builder.Configuration["Jwt:Key"];
-        if (string.IsNullOrEmpty(Key))
+// Register DbContext and application services
+// Use Pomelo MySQL provider (UseMySql) instead of UseMySQL to ensure compatibility.
+builder.Services.AddDbContext<FortivexContext>(options =>
+{
+    var connStr = builder.Configuration.GetConnectionString("DefaultConnection")!;
+    // Auto detect server version for MySql
+    options.UseMySql(connStr, ServerVersion.AutoDetect(connStr));
+});
+
+// Register application services and helpers
+builder.Services.AddScoped<JwtHelper>();
+builder.Services.AddScoped<UserService>();
+
+// JWT Authentication configuration
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKeyForDevelopment12345";
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            // Ha nincs beállítva, használjunk egy alapértelmezettet (fejlesztéshez)
-            Key = "YourSuperSecretKeyForDevelopment12345";
-            // Éles környezetben mindig konfigurációs fájlban kell tárolni!
-        }
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
 
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
- .AddJwtBearer(options =>
- {
-     options.TokenValidationParameters = new TokenValidationParameters
-     {
-         ValidateIssuer = false,
-         ValidateAudience = false,
-         ValidateLifetime = true,
-         ValidateIssuerSigningKey = true,
-         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),
-         ClockSkew = TimeSpan.Zero
-     };
- });
+builder.Services.AddAuthorization();
 
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-        builder.Services.AddAuthorization();
+var app = builder.Build();
 
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-
-        var app = builder.Build();
-        app.UseCors("AllowAll");
-
-
-        // --- Middleware pipeline ---
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        // Authentication & Authorization middleware-ek
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.MapControllers();
-
-        app.Run();
-    }
+// Use Swagger only in development for API documentation
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.CompleteAsync();
+    }
+    else
+    {
+        await next();
+    }
+});
+
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+
+app.Run();
+

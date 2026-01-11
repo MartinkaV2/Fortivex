@@ -3,6 +3,7 @@ using System;
 using FortivexAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -19,11 +20,15 @@ namespace FortivexAPI.Migrations
                 .HasAnnotation("ProductVersion", "8.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
             modelBuilder.Entity("FortivexAPI.Models.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -53,27 +58,27 @@ namespace FortivexAPI.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 10, 27, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(93),
+                            CreatedAt = new DateTime(2025, 11, 4, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6298),
                             Email = "test@fortivex.com",
-                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(97),
+                            LastLogin = new DateTime(2025, 11, 14, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6307),
                             PasswordHash = "test123",
                             Username = "testplayer"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 10, 17, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(104),
+                            CreatedAt = new DateTime(2025, 10, 25, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6310),
                             Email = "admin@fortivex.com",
-                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(106),
+                            LastLogin = new DateTime(2025, 11, 14, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6311),
                             PasswordHash = "admin123",
                             Username = "adminuser"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 11, 1, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(111),
+                            CreatedAt = new DateTime(2025, 11, 9, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6313),
                             Email = "player2@fortivex.com",
-                            LastLogin = new DateTime(2025, 11, 6, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(113),
+                            LastLogin = new DateTime(2025, 11, 14, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6313),
                             PasswordHash = "pass123",
                             Username = "player2"
                         });
@@ -84,6 +89,8 @@ namespace FortivexAPI.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -107,7 +114,7 @@ namespace FortivexAPI.Migrations
                         {
                             Id = 1,
                             AccountId = 2,
-                            AssignedAt = new DateTime(2025, 10, 22, 20, 6, 44, 567, DateTimeKind.Local).AddTicks(497),
+                            AssignedAt = new DateTime(2025, 10, 30, 10, 13, 33, 267, DateTimeKind.Local).AddTicks(6457),
                             Role = "Admin"
                         });
                 });
@@ -117,6 +124,8 @@ namespace FortivexAPI.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -152,6 +161,8 @@ namespace FortivexAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
 
@@ -182,6 +193,82 @@ namespace FortivexAPI.Migrations
                             AccountId = 3,
                             EnemiesKilled = 62,
                             TimePlayed = 5400
+                        });
+                });
+
+            modelBuilder.Entity("FortivexAPI.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountId = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "test@gmail.com",
+                            PasswordHash = "test123",
+                            Role = "user",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Username = "testplayer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccountId = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "adminus@gmail.com",
+                            PasswordHash = "admin123",
+                            Role = "admin",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Username = "adminuser"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccountId = 3,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "player2@gmail.com",
+                            PasswordHash = "pass123",
+                            Role = "user",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Username = "player2"
                         });
                 });
 
@@ -218,6 +305,17 @@ namespace FortivexAPI.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("FortivexAPI.Models.User", b =>
+                {
+                    b.HasOne("FortivexAPI.Models.Account", "Account")
+                        .WithOne("User")
+                        .HasForeignKey("FortivexAPI.Models.User", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("FortivexAPI.Models.Account", b =>
                 {
                     b.Navigation("Admin");
@@ -225,6 +323,8 @@ namespace FortivexAPI.Migrations
                     b.Navigation("PlayerProgress");
 
                     b.Navigation("PlayerStat");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -58,7 +58,7 @@ namespace FortivexAPI.Controllers
             var newAccount = new Account
             {
                 Username = dto.Username,
-                PasswordHash = "default123",
+                PasswordHash = dto.PasswordHash,
                 Email = dto.Email,
                 CreatedAt = DateTime.Now
             };
@@ -79,7 +79,6 @@ namespace FortivexAPI.Controllers
                 return NotFound();
 
             account.Username = dto.Username;
-            account.PasswordHash = dto.PasswordHash;
             account.Email = dto.Email;
             await _context.SaveChangesAsync();
 
@@ -125,7 +124,6 @@ namespace FortivexAPI.Controllers
         }
 
 
-        // ✅ REGISTER: POST /api/accounts/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
         {
@@ -143,7 +141,9 @@ namespace FortivexAPI.Controllers
             _context.Accounts.Add(account);
             await _context.SaveChangesAsync();
 
-            // Ha szerepe admin, itt adjuk hozzá az admins táblába
+            // Admin szerepkör hozzáadása ha szükséges
+            var role = "user";
+
             if (dto.Role.ToLower() == "admin")
             {
                 _context.Admins.Add(new Admin
@@ -153,12 +153,23 @@ namespace FortivexAPI.Controllers
                     AssignedAt = DateTime.Now
                 });
                 await _context.SaveChangesAsync();
+
+                role = "admin";
             }
 
-            return Ok("Sikeres regisztráció!");
+            // TOKEN KÉSZÍTÉSE
+            var token = _jwt.GenerateToken(account.Username, role);
+
+            // TOKEN + role + username visszaküldése
+            return Ok(new
+            {
+                token = token,
+                role = role,
+                username = account.Username
+            });
         }
-
-
-
     }
 }
+
+
+   
