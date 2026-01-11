@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FortivexAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1604bb720797576f6ede8e4fb12bacbd58914aba")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+406cd64b638966a2e5f4bc8b52f710c260b2e6a8")]
 [assembly: System.Reflection.AssemblyProductAttribute("FortivexAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FortivexAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
