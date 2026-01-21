@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // <-- EZT ADD HOZZÁ!
 
 public class AuthUIManager : MonoBehaviour
 {
@@ -42,15 +43,18 @@ public class AuthUIManager : MonoBehaviour
     {
         statusText.text = "Bejelentkezés...";
 
-        // FONTOS VÁLTOZÁS:
-        // A Login most a usernameInput-ot használja az emailInput helyett,
-        // mert a backend a 'userName' mezõt várja a belépéshez.
         StartCoroutine(APIManager.Instance.Login(
-            usernameInput.text, // <--- ITT VOLT A HIBA (vagyis a backend igénye más)
+            usernameInput.text,
             passwordInput.text,
             (response) => {
                 statusText.text = "Sikeres belépés!";
                 Debug.Log("Login OK: " + response);
+
+                // 1 másodperc késleltetés, majd átirányítás
+                Invoke("LoadMainMenu", 1f);
+
+                // ÁTIRÁNYÍTÁS A MAINMENU-RE
+                SceneManager.LoadScene("MainMenu"); // <-- SCENE NÉV
             },
             (error) => {
                 statusText.text = "Belépési hiba: " + error;
