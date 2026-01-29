@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // <-- EZT ADD HOZZÁ!
+using UnityEngine.SceneManagement; // <-- EZT ADD HOZZï¿½!
 
 public class AuthUIManager : MonoBehaviour
 {
@@ -22,14 +22,14 @@ public class AuthUIManager : MonoBehaviour
 
     public void OnRegisterClick()
     {
-        statusText.text = "Regisztráció...";
+        statusText.text = "RegisztrÃ¡ciÃ³...";
 
         StartCoroutine(APIManager.Instance.Register(
             usernameInput.text,
             emailInput.text,
             passwordInput.text,
             (response) => {
-                statusText.text = "Sikeres regisztráció!";
+                statusText.text = "Sikeres regisztrÃ¡ciÃ³!";
                 Debug.Log("Server: " + response);
             },
             (error) => {
@@ -41,23 +41,24 @@ public class AuthUIManager : MonoBehaviour
 
     public void OnLoginClick()
     {
-        statusText.text = "Bejelentkezés...";
+        statusText.text = "BejelentkezÃ©s...";
 
         StartCoroutine(APIManager.Instance.Login(
             usernameInput.text,
             passwordInput.text,
             (response) => {
-                statusText.text = "Sikeres belépés!";
+                statusText.text = "Sikeres bejelentkezÃ©s!";
                 Debug.Log("Login OK: " + response);
 
-                // 1 másodperc késleltetés, majd átirányítás
+                // 1 mï¿½sodperc kï¿½sleltetï¿½s, majd ï¿½tirï¿½nyï¿½tï¿½s
                 Invoke("LoadMainMenu", 1f);
 
-                // ÁTIRÁNYÍTÁS A MAINMENU-RE
-                SceneManager.LoadScene("MainMenu"); // <-- SCENE NÉV
+                // ï¿½TIRï¿½NYï¿½Tï¿½S A MAINMENU-RE
+                SceneManager.LoadScene("MainMenu"); // <-- SCENE Nï¿½V
             },
+            
             (error) => {
-                statusText.text = "Belépési hiba: " + error;
+                statusText.text = "BelÃ©pÃ©si hiba: " + error;
                 Debug.LogError(error);
             }
         ));

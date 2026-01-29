@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-// using System.Diagnostics;  <-- EZT T÷R÷LD KI!
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,14 +10,38 @@ public class APIManager : MonoBehaviour
 
     private string baseUrl = "http://localhost:5105/api";
 
+    // üîê JWT TOKEN
+    public string Token { get; private set; }
+
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // REGISZTR¡CI”
-    public IEnumerator Register(string username, string email, string password, Action<string> onSuccess, Action<string> onError)
+    // üîê TOKEN BE√ÅLL√çT√ÅSA LOGIN UT√ÅN
+    public void SetToken(string token)
+    {
+        Token = token;
+        Debug.Log("JWT token elmentve");
+    }
+
+    // =========================
+    // REGISZTR√ÅCI√ì
+    // =========================
+    public IEnumerator Register(
+        string username,
+        string email,
+        string password,
+        Action<string> onSuccess,
+        Action<string> onError)
     {
         string url = baseUrl + "/Accounts/register";
 
@@ -31,13 +54,21 @@ public class APIManager : MonoBehaviour
         };
 
         string jsonData = JsonUtility.ToJson(requestData);
-        Debug.Log("Regisztr·ciÛ k¸ldÈse: " + jsonData);
+        Debug.Log("Regisztr√°ci√≥ k√ºld√©se: " + jsonData);
 
-        yield return StartCoroutine(PostRequest(url, jsonData, onSuccess, onError));
+        yield return StartCoroutine(
+            PostRequest(url, jsonData, false, onSuccess, onError)
+        );
     }
 
-    // BEJELENTKEZ…S
-    public IEnumerator Login(string username, string password, Action<string> onSuccess, Action<string> onError)
+    // =========================
+    // LOGIN
+    // =========================
+    public IEnumerator Login(
+        string username,
+        string password,
+        Action<string> onSuccess,
+        Action<string> onError)
     {
         string url = baseUrl + "/Accounts/login";
 
@@ -48,27 +79,46 @@ public class APIManager : MonoBehaviour
         };
 
         string jsonData = JsonUtility.ToJson(requestData);
-        Debug.Log("Login k¸ldÈse: " + jsonData);
+        Debug.Log("Login k√ºld√©se: " + jsonData);
 
-        yield return StartCoroutine(PostRequest(url, jsonData, onSuccess, onError));
+        yield return StartCoroutine(
+            PostRequest(url, jsonData, false, onSuccess, onError)
+        );
     }
 
-    private IEnumerator PostRequest(string url, string jsonData, Action<string> onSuccess, Action<string> onError)
+    // =========================
+    // √ÅLTAL√ÅNOS POST (AUTH OPCI√ìVAL)
+    // =========================
+    private IEnumerator PostRequest(
+        string url,
+        string jsonData,
+        bool useAuth,
+        Action<string> onSuccess,
+        Action<string> onError)
     {
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
+
             request.SetRequestHeader("Content-Type", "application/json");
+
+            if (useAuth && !string.IsNullOrEmpty(Token))
+            {
+                request.SetRequestHeader(
+                    "Authorization",
+                    "Bearer " + Token
+                );
+            }
 
             yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+            if (request.result != UnityWebRequest.Result.Success)
             {
                 string errorMsg = request.error;
                 if (request.downloadHandler != null)
-                    errorMsg += " | Backend v·lasz: " + request.downloadHandler.text;
+                    errorMsg += " | Backend v√°lasz: " + request.downloadHandler.text;
 
                 onError?.Invoke(errorMsg);
             }

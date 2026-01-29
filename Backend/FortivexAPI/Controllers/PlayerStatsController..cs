@@ -48,22 +48,32 @@ namespace FortivexAPI.Controllers
             };
         }
 
-        [HttpPost]
-        public async Task<ActionResult<PlayerStatsDto>> CreateStats(PlayerStatsDto dto)
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateStats(UpdatePlayerStatsDto dto)
         {
-            var newS = new PlayerStat
+            var stats = await _context.PlayerStats
+                .FirstOrDefaultAsync(x => x.AccountId == dto.AccountId);
+
+            if (stats == null)
             {
-                AccountId = dto.AccountId,
-                EnemiesKilled = dto.EnemiesKilled,
-                TimePlayed = dto.TimePlayed
-            };
+                stats = new PlayerStat
+                {
+                    AccountId = dto.AccountId,
+                    EnemiesKilled = dto.EnemiesKilled,
+                    TimePlayed = dto.TimePlayed
+                };
+                _context.PlayerStats.Add(stats);
+            }
+            else
+            {
+                stats.EnemiesKilled += dto.EnemiesKilled;
+                stats.TimePlayed += dto.TimePlayed;
+            }
 
-            _context.PlayerStats.Add(newS);
             await _context.SaveChangesAsync();
-
-            dto.Id = newS.Id;
-            return CreatedAtAction(nameof(GetStatsById), new { id = dto.Id }, dto);
+            return Ok();
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStats(int id, PlayerStatsDto dto)
