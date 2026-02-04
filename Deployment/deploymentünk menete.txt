@@ -1,0 +1,38 @@
+Too Many Guns and Too Stupid ツ
+
+ — 2025. 10. 22. 9:35
+Regisztráció login, github icon rólunk navbarban és egy kijelentkezés
+Githubrol lehet
+Unity nem lesz Sqlben, később lesz backend
+2,3
+Too Many Guns and Too Stupid ツ
+
+ — 2026. 01. 28. 12:34
+Deployment
+Deployment backend szervert egy oldalra, fontos hogy a weboldal host engedjen c# sharpot futtatni pl monsterasp, utána publikálni kell az APIt visual studioval, fontos hogy publikálás előtt a deploy.json
+át kell írni hogy a szerverre mutasson és ne a localhostra
+Adatbázis is kell monsteraspet
+by Szalai
+Too Many Guns and Too Stupid ツ
+
+ — 2026. 01. 28. 12:45
+Appsettings.jsonban server localhostrol az adatbázis szerver domsinjere
+Miafaszvan — 2026. 01. 28. 12:49
+9Bw%@q3Zt5K+ pw monsterasp.net hez
+Too Many Guns and Too Stupid ツ
+
+ — 2026. 01. 28. 12:52
+Benr vagyunk megvan a database csinálunk egy weboldalt
+Freesubsomain
+fortivex.runasp.net
+Webdeploy access bekapcsolás
+Publishprofil letöltés
+Too Many Guns and Too Stupid ツ
+
+ — 2026. 01. 28. 12:59
+Https, enable https, lets encrypt, lets encrypt lejárati idő 18.02. enable, visual stúdió,backendben az appsettings.json atirva, publish és a deployment weboldala megjelölve
+Jobb klikk publish hová és az import profil, kérni fog egy filera és a letöltött fájlt jelolod ki majd import. Publish, API adat szerzés
+Too Many Guns and Too Stupid ツ
+
+ — 2026. 01. 28. 13:15
+Api Json getnel http 500as hiba CORSok
