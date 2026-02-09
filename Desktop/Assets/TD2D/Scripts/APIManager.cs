@@ -128,4 +128,86 @@ public class APIManager : MonoBehaviour
             }
         }
     }
+
+    // =========================================================
+    // ================= PLAYER STATS (KILL REGISTER) ==========
+    // =========================================================
+
+    [Serializable]
+    public class PlayerStatsDto
+    {
+        public int id;
+        public int accountId;
+        public int enemiesKilled;
+        public int timePlayed;
+    }
+
+    // PUBLIC HÍVÁS
+    public void RegisterKill(int accountId)
+    {
+        StartCoroutine(RegisterKillCoroutine(accountId));
+    }
+
+    // COROUTINE
+// COROUTINE
+private IEnumerator RegisterKillCoroutine(int accountId)
+{
+    // 1️⃣ GET ALL playerstats
+    string getUrl = $"{baseUrl}/PlayerStats";   // <-- EZ A HELYES URL
+    UnityWebRequest getReq = UnityWebRequest.Get(getUrl);
+    getReq.SetRequestHeader("Authorization", "Bearer " + Token);
+
+    yield return getReq.SendWebRequest();
+
+    if (getReq.result != UnityWebRequest.Result.Success)
+    {
+        Debug.LogError("Get stats error: " + getReq.error + " | " + getReq.downloadHandler.text);
+        yield break;
+    }
+
+    // 2️⃣ JSON → lista
+    PlayerStatsDto[] allStats = JsonHelper.FromJson<PlayerStatsDto>(getReq.downloadHandler.text);
+
+    PlayerStatsDto myStats = null;
+
+    foreach (var s in allStats)
+    {
+        if (s.accountId == accountId)
+        {
+            myStats = s;
+            break;
+        }
+    }
+
+    if (myStats == null)
+    {
+        Debug.LogError("Nincs PlayerStats rekord ehhez az accountId-hoz: " + accountId);
+        yield break;
+    }
+
+    // 3️⃣ módosítás
+    myStats.enemiesKilled += 1;
+
+    // 4️⃣ PUT visszaküldés
+    string putUrl = $"{baseUrl}/PlayerStats/{myStats.id}";
+    string json = JsonUtility.ToJson(myStats);
+
+    UnityWebRequest putReq = new UnityWebRequest(putUrl, "PUT");
+    byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+    putReq.uploadHandler = new UploadHandlerRaw(bodyRaw);
+    putReq.downloadHandler = new DownloadHandlerBuffer();
+    putReq.SetRequestHeader("Content-Type", "application/json");
+    putReq.SetRequestHeader("Authorization", "Bearer " + Token);
+
+    yield return putReq.SendWebRequest();
+
+    if (putReq.result != UnityWebRequest.Result.Success)
+    {
+        Debug.LogError("Update stats error: " + putReq.error + " | " + putReq.downloadHandler.text);
+    }
+    else
+    {
+        Debug.Log("✅ Kill registered → enemiesKilled növelve");
+    }
+}
 }
