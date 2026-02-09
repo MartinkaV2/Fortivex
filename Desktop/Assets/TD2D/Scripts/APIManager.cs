@@ -8,7 +8,7 @@ public class APIManager : MonoBehaviour
 {
     public static APIManager Instance;
 
-    private string baseUrl = "http://localhost:5105/api";
+    private string baseUrl = "https://fortivex.runasp.net/api";
 
     // 🔐 JWT TOKEN
     public string Token { get; private set; }
