@@ -6,7 +6,7 @@ public class RegisterRequest
     public string userName;      // Swaggeren: "userName"
     public string passwordHash;  // Swaggeren: "passwordHash"
     public string email;         // Swaggeren: "email"
-    public string role;          // Swaggeren: "role" (ezt is kéri a regisztráció!)
+    public string role;          // Swaggeren: "role" (ezt is kï¿½ri a regisztrï¿½ciï¿½!)
 }
 
 [Serializable]
@@ -19,9 +19,10 @@ public class LoginRequest
 [Serializable]
 public class AuthResponse
 {
-    // Ezt a választ a backendtõl kapjuk, lehet, hogy csak egy sima string üzenet jön,
-    // de ha JSON jön, akkor ide kell illeszteni a mezõit.
-    // Egyelõre hagyjuk így, a logokból majd látjuk, mit küld vissza pontosan.
+    // Ezt a vï¿½laszt a backendtï¿½l kapjuk, lehet, hogy csak egy sima string ï¿½zenet jï¿½n,
+    // de ha JSON jï¿½n, akkor ide kell illeszteni a mezï¿½it.
+    // Egyelï¿½re hagyjuk ï¿½gy, a logokbï¿½l majd lï¿½tjuk, mit kï¿½ld vissza pontosan.
     public string token;
+    public int accountId;
     public string message;
 }
