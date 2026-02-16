@@ -182,6 +182,19 @@ public class AuthUIManager : MonoBehaviour
                 PlayerPrefs.Save();
                 Debug.Log("✅ AccountId elmentve: " + accountId);
                 
+                // --- ITT AZ ÚJ RÉSZ ---
+                // Statisztika kezelő inicializálása és mérés indítása
+                if (PlayerStatsManager.Instance != null)
+                {
+                    Debug.Log("⏳ Statisztikák betöltése és mérés indítása...");
+                    PlayerStatsManager.Instance.InitAndLoadStats(accountId);
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ PlayerStatsManager nincs a Scene-ben, a mérés nem indult el!");
+                }
+                // ---------------------
+
                 statusText.text = "Sikeres bejelentkezés!";
                 Invoke("LoadMainMenu", 1f);
             },
