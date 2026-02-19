@@ -75,11 +75,11 @@ public class PlayerStatsManager : MonoBehaviour
 
         foreach (var stat in allStats)
         {
-            if (stat.accountId == accountId)
+            if (stat.AccountId == accountId)
             {
-                myDbId = stat.id;
-                enemiesKilled = stat.enemiesKilled;
-                timePlayedSeconds = stat.timePlayed;
+                myDbId = stat.Id;
+                enemiesKilled = stat.EnemiesKilled;
+                timePlayedSeconds = stat.TimePlayed;
 
                 found = true;
 
@@ -105,26 +105,39 @@ public class PlayerStatsManager : MonoBehaviour
     {
         PlayerStatsDto dto = new PlayerStatsDto
         {
-            accountId = accountId,
-            enemiesKilled = 0,
-            timePlayed = 0
+            AccountId      = accountId,
+            EnemiesKilled  = 0,
+            TimePlayed     = 0,
+            Level          = 1,
+            CurrentXp      = 0,
+            NextLevelXp    = 100,
+            Wins           = 0,
+            TotalGames     = 0,
+            TotalGold      = 0,
+            CurrentGold    = 0,
+            MaxWaveReached = 0
         };
 
         string json = JsonUtility.ToJson(dto);
+        Debug.Log("CREATE STATS JSON: " + json);
+
         byte[] body = Encoding.UTF8.GetBytes(json);
 
         UnityWebRequest req = new UnityWebRequest(BASE_URL, "POST");
-        req.uploadHandler = new UploadHandlerRaw(body);
+        req.uploadHandler   = new UploadHandlerRaw(body);
         req.downloadHandler = new DownloadHandlerBuffer();
 
-        req.SetRequestHeader("Content-Type", "application/json");
+        req.SetRequestHeader("Content-Type",  "application/json");
         req.SetRequestHeader("Authorization", "Bearer " + APIManager.Instance.Token);
 
         yield return req.SendWebRequest();
 
+        string responseBody = req.downloadHandler != null ? req.downloadHandler.text : "(no body)";
+        Debug.Log($"CREATE STATS RESPONSE ({req.responseCode}): {responseBody}");
+
         if (req.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError("CREATE STATS ERROR: " + req.error);
+            Debug.LogError($"CREATE STATS ERROR: {req.error} | HTTP {req.responseCode} | Body: {responseBody}");
             yield break;
         }
 
@@ -187,10 +200,10 @@ public class PlayerStatsManager : MonoBehaviour
     {
         PlayerStatsDto dto = new PlayerStatsDto
         {
-            id = myDbId,
-            accountId = accountId,
-            enemiesKilled = enemiesKilled,
-            timePlayed = timePlayedSeconds
+            Id = myDbId,
+            AccountId  = accountId,
+            EnemiesKilled = enemiesKilled,
+            TimePlayed = timePlayedSeconds
         };
 
         string json = JsonUtility.ToJson(dto);

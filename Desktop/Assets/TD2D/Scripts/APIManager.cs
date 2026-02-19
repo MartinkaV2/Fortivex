@@ -210,10 +210,18 @@ public class APIManager : MonoBehaviour
     [Serializable]
     public class PlayerStatsDto
     {
-        public int id;
-        public int accountId;
-        public int enemiesKilled;
-        public int timePlayed;
+        public int Id;
+        public int AccountId;
+        public int EnemiesKilled;
+        public int TimePlayed;
+        public int Level = 1;
+        public int CurrentXp = 0;
+        public int NextLevelXp = 100;
+        public int Wins = 0;
+        public int TotalGames = 0;
+        public long TotalGold = 0;
+        public long CurrentGold = 0;
+        public int MaxWaveReached = 0;
     }
 
     // PUBLIC HÍVÁS
@@ -245,7 +253,7 @@ public class APIManager : MonoBehaviour
 
         foreach (var s in allStats)
         {
-            if (s.accountId == accountId)
+            if (s.AccountId == accountId)
             {
                 myStats = s;
                 break;
@@ -271,10 +279,10 @@ public class APIManager : MonoBehaviour
         }
 
         // 3️⃣ módosítás
-        myStats.enemiesKilled += 1;
+        myStats.EnemiesKilled += 1;
 
         // 4️⃣ PUT visszaküldés
-        string putUrl = $"{baseUrl}/PlayerStats/{myStats.id}";
+        string putUrl = $"{baseUrl}/PlayerStats/{myStats.Id}";
         string json = JsonUtility.ToJson(myStats);
 
         UnityWebRequest putReq = new UnityWebRequest(putUrl, "PUT");
@@ -306,9 +314,17 @@ public class APIManager : MonoBehaviour
         // Új PlayerStats alapértelmezett értékekkel
         PlayerStatsDto newStats = new PlayerStatsDto
         {
-            accountId = accountId,
-            enemiesKilled = 1,  // ✅ Rögtön 1-re állítjuk (ez az első kill)
-            timePlayed = 0
+            AccountId      = accountId,
+            EnemiesKilled  = 1,   // ✅ Rögtön 1-re állítjuk (ez az első kill)
+            TimePlayed     = 0,
+            Level          = 1,
+            CurrentXp      = 0,
+            NextLevelXp    = 100,
+            Wins           = 0,
+            TotalGames     = 0,
+            TotalGold      = 0,
+            CurrentGold    = 0,
+            MaxWaveReached = 0
         };
 
         string jsonData = JsonUtility.ToJson(newStats);
@@ -338,7 +354,7 @@ public class APIManager : MonoBehaviour
 
                 PlayerStatsDto createdStats = JsonUtility.FromJson<PlayerStatsDto>(responseJson);
                 
-                Debug.Log($"✅ PlayerStats sikeresen létrehozva! ID: {createdStats.id}, AccountId: {createdStats.accountId}");
+                Debug.Log($"✅ PlayerStats sikeresen létrehozva! ID: {createdStats.Id}, AccountId: {createdStats.AccountId}");
                 
                 onSuccess?.Invoke(createdStats);
             }
