@@ -301,6 +301,14 @@ public class APIManager : MonoBehaviour
         else
         {
             Debug.Log("✅ Kill registered → enemiesKilled növelve");
+            // ===== SZINKRONIZÁLÁS PlayerStatsManager-rel =====
+            // Ha PlayerStatsManager is fut, frissítjük a lokális értékét,
+            // különben PutStats() 0-val írná vissza a szerveren lévő értéket!
+            if (PlayerStatsManager.Instance != null)
+            {
+                PlayerStatsManager.Instance.enemiesKilled = myStats.EnemiesKilled;
+                Debug.Log($"🔄 PSM szinkronizálva → enemiesKilled: {myStats.EnemiesKilled}");
+            }
         }
     }
 

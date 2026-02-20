@@ -8,15 +8,28 @@ public class PlayerStatsManager : MonoBehaviour
     public static PlayerStatsManager Instance;
 
     // ===== PLAYER DATA =====
-    private int myDbId; // PlayerStats PK
+    private int myDbId;
     private int accountId;
+    public int AccountId => accountId;
 
     public int enemiesKilled;
     public int timePlayedSeconds;
 
-    private float timerBuffer = 0f;
-    private bool isTracking = false;
+    // ===== SZERVEREN TÁROLT ÖSSZES MEZŐ (hogy PUT-nál ne nullázzuk vissza) =====
+    private int cachedLevel        = 1;
+    private int cachedCurrentXp    = 0;
+    private int cachedNextLevelXp  = 100;
+    private int cachedWins         = 0;
+    private int cachedTotalGames   = 0;
+    private long cachedTotalGold   = 0;
+    private long cachedCurrentGold = 0;
+    private int cachedMaxWave      = 0;
+
+    private float timerBuffer    = 0f;
+    private bool isTracking      = false;
     private bool autoSaveRunning = false;
+    private bool isSaving        = false; // folyamatban lévő mentés jelzője
+    private bool isLoading       = false; // GET fut → PUT blokkolva
 
     private const string BASE_URL = "https://fortivex.runasp.net/api/PlayerStats";
 
@@ -26,6 +39,8 @@ public class PlayerStatsManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            // Kilépés előtt megvárjuk hogy a mentés lefusson
+            Application.wantsToQuit += OnWantsToQuit;
         }
         else Destroy(gameObject);
     }
@@ -33,9 +48,7 @@ public class PlayerStatsManager : MonoBehaviour
     void Update()
     {
         if (!isTracking) return;
-
         timerBuffer += Time.deltaTime;
-
         if (timerBuffer >= 1f)
         {
             timePlayedSeconds++;
@@ -57,36 +70,47 @@ public class PlayerStatsManager : MonoBehaviour
     // =========================================================
     IEnumerator GetStatsAndStartTracking()
     {
+        isLoading = true; // ← BLOKKOLJUK A PUT-OT amíg a GET fut
+
         UnityWebRequest req = UnityWebRequest.Get(BASE_URL);
         req.SetRequestHeader("Authorization", "Bearer " + APIManager.Instance.Token);
-
         yield return req.SendWebRequest();
 
         if (req.result != UnityWebRequest.Result.Success)
         {
+            isLoading = false;
             Debug.LogError("STATS LOAD ERROR: " + req.error);
             yield break;
         }
 
-        string json = req.downloadHandler.text;
-        PlayerStatsDto[] allStats = JsonHelper.FromJson<PlayerStatsDto>(json);
-
+        PlayerStatsDto[] allStats = JsonHelper.FromJson<PlayerStatsDto>(req.downloadHandler.text);
         bool found = false;
 
         foreach (var stat in allStats)
         {
             if (stat.AccountId == accountId)
             {
-                myDbId = stat.Id;
-                enemiesKilled = stat.EnemiesKilled;
+                myDbId            = stat.Id;
+                enemiesKilled     = stat.EnemiesKilled;
                 timePlayedSeconds = stat.TimePlayed;
 
-                found = true;
+                // ===== ÖSSZES MEZŐ CACHE-ELÉSE =====
+                cachedLevel        = stat.Level;
+                cachedCurrentXp    = stat.CurrentXp;
+                cachedNextLevelXp  = stat.NextLevelXp;
+                cachedWins         = stat.Wins;
+                cachedTotalGames   = stat.TotalGames;
+                cachedTotalGold    = stat.TotalGold;
+                cachedCurrentGold  = stat.CurrentGold;
+                cachedMaxWave      = stat.MaxWaveReached;
 
-                Debug.Log($"Stats betöltve → Time: {timePlayedSeconds}s | Kills: {enemiesKilled}");
+                found = true;
+                Debug.Log($"Stats betöltve → Time: {timePlayedSeconds}s | Kills: {enemiesKilled} | Level: {cachedLevel}");
                 break;
             }
         }
+
+        isLoading = false; // ← GET kész, PUT újra engedélyezett
 
         if (!found)
         {
@@ -118,18 +142,14 @@ public class PlayerStatsManager : MonoBehaviour
             MaxWaveReached = 0
         };
 
-        string json = JsonUtility.ToJson(dto);
-        Debug.Log("CREATE STATS JSON: " + json);
-
-        byte[] body = Encoding.UTF8.GetBytes(json);
+        string json  = JsonUtility.ToJson(dto);
+        byte[] body  = Encoding.UTF8.GetBytes(json);
 
         UnityWebRequest req = new UnityWebRequest(BASE_URL, "POST");
         req.uploadHandler   = new UploadHandlerRaw(body);
         req.downloadHandler = new DownloadHandlerBuffer();
-
         req.SetRequestHeader("Content-Type",  "application/json");
         req.SetRequestHeader("Authorization", "Bearer " + APIManager.Instance.Token);
-
         yield return req.SendWebRequest();
 
         string responseBody = req.downloadHandler != null ? req.downloadHandler.text : "(no body)";
@@ -142,8 +162,6 @@ public class PlayerStatsManager : MonoBehaviour
         }
 
         Debug.Log("Stats rekord létrehozva!");
-
-        // újra lekérjük hogy megkapjuk ID-t
         yield return StartCoroutine(GetStatsAndStartTracking());
     }
 
@@ -153,7 +171,6 @@ public class PlayerStatsManager : MonoBehaviour
     void StartTracking()
     {
         isTracking = true;
-
         if (!autoSaveRunning)
             StartCoroutine(AutoSaveRoutine());
     }
@@ -164,13 +181,11 @@ public class PlayerStatsManager : MonoBehaviour
     IEnumerator AutoSaveRoutine()
     {
         autoSaveRunning = true;
-
         while (isTracking)
         {
             yield return new WaitForSeconds(60f);
-            SaveStats();
+            yield return StartCoroutine(PutStats());
         }
-
         autoSaveRunning = false;
     }
 
@@ -180,70 +195,90 @@ public class PlayerStatsManager : MonoBehaviour
     public void AddKill()
     {
         enemiesKilled++;
-        SaveStats();
-    }
-
-    // =========================================================
-    // SAVE ENTRY
-    // =========================================================
-    public void SaveStats()
-    {
-        if (!isTracking || myDbId == 0) return;
-
         StartCoroutine(PutStats());
     }
 
     // =========================================================
-    // PUT UPDATE
+    // SAVE ENTRY (külső híváshoz)
+    // =========================================================
+    public void SaveStats()
+    {
+        if (!isTracking || myDbId == 0) return;
+        StartCoroutine(PutStats());
+    }
+
+    // =========================================================
+    // PUT UPDATE — MINDEN MEZŐT ELKÜLDI
     // =========================================================
     IEnumerator PutStats()
     {
+        // Ha még töltünk a szerverről, NE írjuk felül 0-val!
+        if (myDbId == 0 || !isTracking || isLoading) yield break;
+
+        isSaving = true;
+
         PlayerStatsDto dto = new PlayerStatsDto
         {
-            Id = myDbId,
-            AccountId  = accountId,
-            EnemiesKilled = enemiesKilled,
-            TimePlayed = timePlayedSeconds
+            Id             = myDbId,
+            AccountId      = accountId,
+            EnemiesKilled  = enemiesKilled,
+            TimePlayed     = timePlayedSeconds,
+            // ===== CACHE-ELT ÉRTÉKEK - nem nullázzuk vissza =====
+            Level          = cachedLevel,
+            CurrentXp      = cachedCurrentXp,
+            NextLevelXp    = cachedNextLevelXp,
+            Wins           = cachedWins,
+            TotalGames     = cachedTotalGames,
+            TotalGold      = cachedTotalGold,
+            CurrentGold    = cachedCurrentGold,
+            MaxWaveReached = cachedMaxWave
         };
 
         string json = JsonUtility.ToJson(dto);
         byte[] body = Encoding.UTF8.GetBytes(json);
-
-        string url = $"{BASE_URL}/{myDbId}";
+        string url  = $"{BASE_URL}/{myDbId}";
 
         UnityWebRequest req = new UnityWebRequest(url, "PUT");
-        req.uploadHandler = new UploadHandlerRaw(body);
+        req.uploadHandler   = new UploadHandlerRaw(body);
         req.downloadHandler = new DownloadHandlerBuffer();
-
-        req.SetRequestHeader("Content-Type", "application/json");
+        req.SetRequestHeader("Content-Type",  "application/json");
         req.SetRequestHeader("Authorization", "Bearer " + APIManager.Instance.Token);
 
         yield return req.SendWebRequest();
 
         if (req.result != UnityWebRequest.Result.Success)
-        {
             Debug.LogError("STATS SAVE ERROR: " + req.error + " | " + req.downloadHandler.text);
-        }
         else
-        {
-            Debug.Log($"STATS SAVED → Time: {timePlayedSeconds}s");
-        }
+            Debug.Log($"STATS SAVED → Kills: {enemiesKilled} | Time: {timePlayedSeconds}s");
+
+        isSaving = false;
     }
 
     // =========================================================
-    // PAUSE SAVE
+    // KILÉPÉS ELŐTTI MENTÉS
+    // Coroutine helyett várakozás loop-pal, mert OnApplicationQuit-ban
+    // nem fut coroutine
     // =========================================================
+    private bool OnWantsToQuit()
+    {
+        if (myDbId == 0 || !isTracking) return true;
+
+        // Ha már folyamatban van egy mentés, várjuk meg
+        if (isSaving) return false;
+
+        StartCoroutine(SaveAndQuit());
+        return false; // Ne lépjen ki azonnal
+    }
+
+    IEnumerator SaveAndQuit()
+    {
+        isSaving = true;
+        yield return StartCoroutine(PutStats());
+        Application.Quit();
+    }
+
     void OnApplicationPause(bool pause)
     {
-        if (pause)
-            SaveStats();
-    }
-
-    // =========================================================
-    // QUIT SAVE
-    // =========================================================
-    void OnApplicationQuit()
-    {
-        SaveStats();
+        if (pause) StartCoroutine(PutStats());
     }
 }
