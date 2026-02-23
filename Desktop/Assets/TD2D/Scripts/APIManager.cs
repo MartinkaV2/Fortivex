@@ -143,9 +143,6 @@ public class APIManager : MonoBehaviour
         public string lastLogin;
     }
 
-    /// <summary>
-    /// Lekérdezi az accountId-t username alapján
-    /// </summary>
     public IEnumerator GetAccountIdByUsername(
         string username,
         Action<int> onSuccess,
@@ -154,8 +151,7 @@ public class APIManager : MonoBehaviour
         string url = baseUrl + "/Accounts";
 
         UnityWebRequest request = UnityWebRequest.Get(url);
-        
-        // ✅ JWT TOKEN HOZZÁADÁSA
+
         if (!string.IsNullOrEmpty(Token))
         {
             request.SetRequestHeader("Authorization", "Bearer " + Token);
@@ -173,19 +169,15 @@ public class APIManager : MonoBehaviour
             yield break;
         }
 
-        // JSON feldolgozás
         try
         {
             string json = request.downloadHandler.text;
             Debug.Log("🔍 Accounts API válasz: " + json);
 
-            // JSON array feldolgozás
             AccountDto[] accounts = JsonHelper.FromJson<AccountDto>(json);
 
-            // Username alapján keresés
             foreach (var account in accounts)
             {
-                // Case-insensitive összehasonlítás
                 if (account.username.Equals(username, StringComparison.OrdinalIgnoreCase))
                 {
                     Debug.Log($"✅ AccountId megtalálva: {account.id} (username: {account.username})");
@@ -194,13 +186,69 @@ public class APIManager : MonoBehaviour
                 }
             }
 
-            // Ha nem találtuk meg
             onError?.Invoke($"Nem található account ezzel a username-mel: {username}");
         }
         catch (Exception e)
         {
             onError?.Invoke($"JSON feldolgozási hiba: {e.Message}");
         }
+    }
+
+    // =========================================================
+    // ================= RECENT GAME MENTÉSE ===================
+    // =========================================================
+
+    [Serializable]
+    public class GameResultRequest
+    {
+        public bool Won;
+        public string MapName;
+        public int WaveReached;
+        public int Duration;
+        public int GoldEarned;
+        public int EnemiesKilled;
+        public int XpEarned;
+    }
+
+    public IEnumerator SaveRecentGame(
+        int accountId,
+        string mapName,
+        bool won,
+        int waveReached,
+        int duration,
+        int goldEarned = 0,
+        int enemiesKilled = 0,
+        int xpEarned = 0,
+        Action onSuccess = null,
+        Action<string> onError = null)
+    {
+        // ✅ accountId az URL-ben van, nem a body-ban
+        string url = $"{baseUrl}/PlayerStats/account/{accountId}/game";
+
+        GameResultRequest dto = new GameResultRequest
+        {
+            Won          = won,
+            MapName      = mapName,
+            WaveReached  = waveReached,
+            Duration     = duration,
+            GoldEarned   = goldEarned,
+            EnemiesKilled = enemiesKilled,
+            XpEarned     = xpEarned
+        };
+
+        string json = JsonUtility.ToJson(dto);
+        Debug.Log($"📤 SaveRecentGame küldése → URL: {url} | Body: {json}");
+
+        yield return StartCoroutine(PostRequest(url, json, true,
+            (response) => {
+                Debug.Log("✅ RecentGame elmentve: " + response);
+                onSuccess?.Invoke();
+            },
+            (error) => {
+                Debug.LogError("❌ RecentGame mentési hiba: " + error);
+                onError?.Invoke(error);
+            }
+        ));
     }
 
     // =========================================================
@@ -224,16 +272,13 @@ public class APIManager : MonoBehaviour
         public int MaxWaveReached = 0;
     }
 
-    // PUBLIC HÍVÁS
     public void RegisterKill(int accountId)
     {
         StartCoroutine(RegisterKillCoroutine(accountId));
     }
 
-    // COROUTINE
     private IEnumerator RegisterKillCoroutine(int accountId)
     {
-        // 1️⃣ GET ALL playerstats
         string getUrl = $"{baseUrl}/PlayerStats";
         UnityWebRequest getReq = UnityWebRequest.Get(getUrl);
         getReq.SetRequestHeader("Authorization", "Bearer " + Token);
@@ -246,7 +291,6 @@ public class APIManager : MonoBehaviour
             yield break;
         }
 
-        // 2️⃣ JSON → lista
         PlayerStatsDto[] allStats = JsonHelper.FromJson<PlayerStatsDto>(getReq.downloadHandler.text);
 
         PlayerStatsDto myStats = null;
@@ -260,12 +304,10 @@ public class APIManager : MonoBehaviour
             }
         }
 
-        // ✅ HA NINCS MÉG PLAYERSTATS REKORD, LÉTREHOZZUK!
         if (myStats == null)
         {
             Debug.LogWarning($"⚠️ Nincs PlayerStats rekord az accountId={accountId}-hoz. Létrehozás...");
-            
-            // POST kérés - új PlayerStats létrehozása
+
             yield return StartCoroutine(CreatePlayerStats(accountId, (newStats) =>
             {
                 myStats = newStats;
@@ -278,10 +320,8 @@ public class APIManager : MonoBehaviour
             }
         }
 
-        // 3️⃣ módosítás
         myStats.EnemiesKilled += 1;
 
-        // 4️⃣ PUT visszaküldés
         string putUrl = $"{baseUrl}/PlayerStats/{myStats.Id}";
         string json = JsonUtility.ToJson(myStats);
 
@@ -301,9 +341,6 @@ public class APIManager : MonoBehaviour
         else
         {
             Debug.Log("✅ Kill registered → enemiesKilled növelve");
-            // ===== SZINKRONIZÁLÁS PlayerStatsManager-rel =====
-            // Ha PlayerStatsManager is fut, frissítjük a lokális értékét,
-            // különben PutStats() 0-val írná vissza a szerveren lévő értéket!
             if (PlayerStatsManager.Instance != null)
             {
                 PlayerStatsManager.Instance.enemiesKilled = myStats.EnemiesKilled;
@@ -312,18 +349,14 @@ public class APIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Új PlayerStats rekord létrehozása a backend-en (POST)
-    /// </summary>
     private IEnumerator CreatePlayerStats(int accountId, Action<PlayerStatsDto> onSuccess)
     {
         string url = $"{baseUrl}/PlayerStats";
 
-        // Új PlayerStats alapértelmezett értékekkel
         PlayerStatsDto newStats = new PlayerStatsDto
         {
             AccountId      = accountId,
-            EnemiesKilled  = 1,   // ✅ Rögtön 1-re állítjuk (ez az első kill)
+            EnemiesKilled  = 1,
             TimePlayed     = 0,
             Level          = 1,
             CurrentXp      = 0,
@@ -356,14 +389,13 @@ public class APIManager : MonoBehaviour
         {
             try
             {
-                // A backend visszaküldi a létrehozott objektumot (id-val együtt)
                 string responseJson = request.downloadHandler.text;
                 Debug.Log("📥 Backend válasz: " + responseJson);
 
                 PlayerStatsDto createdStats = JsonUtility.FromJson<PlayerStatsDto>(responseJson);
-                
+
                 Debug.Log($"✅ PlayerStats sikeresen létrehozva! ID: {createdStats.Id}, AccountId: {createdStats.AccountId}");
-                
+
                 onSuccess?.Invoke(createdStats);
             }
             catch (Exception e)
