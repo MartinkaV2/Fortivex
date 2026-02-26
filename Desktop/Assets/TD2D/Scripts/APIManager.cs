@@ -349,6 +349,149 @@ public class APIManager : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // ================= MAP PROGRESS MENTÉSE ==================
+    // =========================================================
+
+    [Serializable]
+    public class MapProgressUpdateRequest
+    {
+        public int MapId;
+        public bool Completed;
+        public int Stars;
+        public int Time;
+        public int CompletionPercent;
+    }
+
+    [Serializable]
+    public class MapProgressDto
+    {
+        // camelCase: pontosan egyezik a backend JSON kulcsaival
+        public int id;
+        public int accountId;
+        public int mapId;
+        public string name;
+        public bool completed;
+        public int stars;
+        public int bestTime;
+        public int completionPercent;
+    }
+
+    /// <summary>
+    /// Map progress mentése: GET-tel lekéri a rekord Id-ját, majd PUT-tal frissíti.
+    /// Csak akkor ír felül Stars/BestTime értéket, ha az új jobb.
+    /// </summary>
+    public IEnumerator SaveMapProgress(
+        int accountId,
+        int mapId,
+        string mapName,
+        bool completed,
+        int stars,
+        int timeSeconds,
+        int completionPercent,
+        Action onSuccess = null,
+        Action<string> onError = null)
+    {
+        // ── 1. lépés: GET – megkeressük a rekordot és annak Id-ját ────────
+        string getUrl = $"{baseUrl}/PlayerMapProgress/{accountId}";
+        UnityWebRequest getReq = UnityWebRequest.Get(getUrl);
+        if (!string.IsNullOrEmpty(Token))
+            getReq.SetRequestHeader("Authorization", "Bearer " + Token);
+
+        yield return getReq.SendWebRequest();
+
+        if (getReq.result != UnityWebRequest.Result.Success)
+        {
+            string err = $"MapProgress GET hiba: {getReq.error} | {getReq.downloadHandler.text}";
+            Debug.LogError("❌ " + err);
+            onError?.Invoke(err);
+            yield break;
+        }
+
+        MapProgressDto targetRecord = null;
+        try
+        {
+            string raw = getReq.downloadHandler.text;
+            Debug.Log($"🗺️ MapProgress GET válasz: {raw}");
+            MapProgressDto[] all = JsonHelper.FromJson<MapProgressDto>(raw);
+
+            // Keresés name alapján (a backend nem mindig küldi a mapId-t)
+            var foundNames = new System.Text.StringBuilder();
+            foreach (var entry in all)
+            {
+                foundNames.Append($"[id={entry.id} name={entry.name}] ");
+                // Egyezés: name alapján (pl. "Tél", "Nyár", "Ősz")
+                if (string.Equals(entry.name, mapName, System.StringComparison.OrdinalIgnoreCase))
+                    targetRecord = entry;
+            }
+            Debug.Log($"🗺️ Talált rekordok: {foundNames} | Keresett: name={mapName}");
+        }
+        catch (Exception e)
+        {
+            string err = $"MapProgress GET parse hiba: {e.Message}";
+            Debug.LogError("❌ " + err);
+            onError?.Invoke(err);
+            yield break;
+        }
+
+        if (targetRecord == null)
+        {
+            string err = $"Nem található MapProgress rekord (AccountId={accountId}, Name={mapName}). " +
+                         $"Ellenőrizd hogy a GameResultReporter Map Name mezője pontosan egyezik az adatbázisban lévővel (Nyár, Tél, Ősz)!";
+            Debug.LogError("❌ " + err);
+            onError?.Invoke(err);
+            yield break;
+        }
+
+        Debug.Log($"✅ MapProgress rekord megtalálva: Id={targetRecord.id}, Stars={targetRecord.stars}, BestTime={targetRecord.bestTime}");
+
+        // ── 2. lépés: csak akkor írjuk felül, ha jobb eredmény született ──
+        // Stars: mindig a legmagasabbat tartjuk meg
+        int newStars = Mathf.Max(targetRecord.stars, stars);
+
+        // BestTime: győzelemnél a legkisebb időt tartjuk (0 = még nem volt győzelem)
+        int newBestTime = targetRecord.bestTime;
+        if (completed)
+        {
+            newBestTime = (targetRecord.bestTime == 0)
+                ? timeSeconds
+                : Mathf.Min(targetRecord.bestTime, timeSeconds);
+        }
+
+        // CompletionPercent: mindig a legmagasabbat tartjuk meg
+        int newPercent = Mathf.Max(targetRecord.completionPercent, completionPercent);
+
+        // Completed: ha egyszer már teljesítette, marad true
+        bool newCompleted = targetRecord.completed || completed;
+
+        // ── 3. lépés: POST /api/PlayerMapProgress/{accountId}/update ────
+        // A Swagger szerint ez a helyes endpoint (PUT nem létezik)
+        // Body: MapId, Completed, Stars, Time, CompletionPercent
+        MapProgressUpdateRequest updateDto = new MapProgressUpdateRequest
+        {
+            MapId             = mapId,
+            Completed         = newCompleted,
+            Stars             = newStars,
+            Time              = newBestTime,
+            CompletionPercent = newPercent
+        };
+
+        string updateUrl  = $"{baseUrl}/PlayerMapProgress/{accountId}/update";
+        string updateJson = JsonUtility.ToJson(updateDto);
+        Debug.Log($"🗺️ MapProgress update POST → {updateUrl} | {updateJson}");
+
+        yield return StartCoroutine(PostRequest(updateUrl, updateJson, true,
+            (response) => {
+                Debug.Log($"✅ MapProgress mentve! Stars:{newStars} | BestTime:{newBestTime}s | Percent:{newPercent}% | Completed:{newCompleted}");
+                onSuccess?.Invoke();
+            },
+            (error) => {
+                Debug.LogError("❌ MapProgress update hiba: " + error);
+                onError?.Invoke(error);
+            }
+        ));
+    }
+
     private IEnumerator CreatePlayerStats(int accountId, Action<PlayerStatsDto> onSuccess)
     {
         string url = $"{baseUrl}/PlayerStats";
