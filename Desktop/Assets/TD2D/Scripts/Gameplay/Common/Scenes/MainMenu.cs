@@ -35,6 +35,17 @@ public class MainMenu : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Handle Escape key to quit the game from the main menu.
+	/// </summary>
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			QuitGame();
+		}
+	}
+
+	/// <summary>
 	/// Buttons pressed handler.
 	/// </summary>
 	/// <param name="obj">Object.</param>
@@ -44,7 +55,7 @@ public class MainMenu : MonoBehaviour
 		switch (param)
 		{
 		case "Quit":
-			Application.Quit();
+			QuitGame();
 			break;
 		case "Start":
 			SceneManager.LoadScene(startSceneName);
@@ -56,5 +67,17 @@ public class MainMenu : MonoBehaviour
 			creditsMenu.SetActive(false);
 			break;
 		}
+	}
+
+	/// <summary>
+	/// Quits the application. Works in both Editor and build.
+	/// </summary>
+	private void QuitGame()
+	{
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+#else
+		Application.Quit();
+#endif
 	}
 }

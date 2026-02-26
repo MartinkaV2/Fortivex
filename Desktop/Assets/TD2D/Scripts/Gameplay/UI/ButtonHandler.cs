@@ -10,6 +10,9 @@ public class ButtonHandler : MonoBehaviour
 {
 	public AudioClip audioClip;
 
+	// Maximum time (seconds) to wait for a sound effect before proceeding anyway
+	private const float MaxSoundWait = 3f;
+
 	/// <summary>
 	/// Buttons pressed.
 	/// </summary>
@@ -30,13 +33,13 @@ public class ButtonHandler : MonoBehaviour
 		if (audioClip != null && AudioManager.instance != null)
 		{
 			Button button = GetComponent<Button>();
-			button.interactable = false;
+			if (button != null) button.interactable = false;
 			AudioManager.instance.PlaySound(audioClip);
-			// Wayt for sound effect end
-			yield return new WaitForSecondsRealtime(audioClip.length);
-			button.interactable = true;
+			// Wait for sound effect to end, but no longer than MaxSoundWait
+			yield return new WaitForSecondsRealtime(Mathf.Min(audioClip.length, MaxSoundWait));
+			if (button != null) button.interactable = true;
 		}
-		// Send global event about button preesing
+		// Send global event about button pressing
 		EventManager.TriggerEvent("ButtonPressed", gameObject, buttonName);
 	}
 
