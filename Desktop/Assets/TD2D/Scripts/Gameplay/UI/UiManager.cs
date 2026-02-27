@@ -323,6 +323,8 @@ public class UiManager : MonoBehaviour
 	public void AddGold(int gold)
     {
         SetGold(GetGold() + gold);
+        // Értesítjük a GameResultReporter-t a kapott gold összegről (összegyűjtött, nem egyenleg)
+        EventManager.TriggerEvent("GoldEarned", null, gold.ToString());
     }
 
     /// <summary>

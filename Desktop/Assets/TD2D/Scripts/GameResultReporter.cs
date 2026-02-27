@@ -16,9 +16,24 @@ public class GameResultReporter : MonoBehaviour
     [Tooltip("Hány körből áll ez a pálya? (Tél=5, Nyár=7, Ősz=9)")]
     public int totalWaves = 7;
 
+    // ── Pályánként járó XP győzelem esetén ──────────────────────────
+    // Tél  (MapId=2) →  10 XP
+    // Nyár (MapId=1) →  25 XP
+    // Ősz  (MapId=3) →  50 XP
+    private static int GetXpReward(string map)
+    {
+        switch (map)
+        {
+            case "Tél":  return 10;
+            case "Nyár": return 25;
+            case "Ősz":  return 50;
+            default:     return 0;
+        }
+    }
+
     private float gameStartTime;
-    private int currentWave = 0;
-    private int goldEarned  = 0;
+    private int currentWave  = 0;
+    private int goldEarned   = 0;   // összegyűjtött gold (GoldEarned eseményekből)
     private bool resultSaved = false;
 
     void Awake()
@@ -28,18 +43,18 @@ public class GameResultReporter : MonoBehaviour
 
     void OnEnable()
     {
-        EventManager.StartListening("Victory",     OnVictory);
-        EventManager.StartListening("Defeat",      OnDefeat);
-        EventManager.StartListening("WaveStart",   OnWaveStart);
-        EventManager.StartListening("GoldChanged", OnGoldChanged);
+        EventManager.StartListening("Victory",    OnVictory);
+        EventManager.StartListening("Defeat",     OnDefeat);
+        EventManager.StartListening("WaveStart",  OnWaveStart);
+        EventManager.StartListening("GoldEarned", OnGoldEarned);  // ← javítva: GoldEarned
     }
 
     void OnDisable()
     {
-        EventManager.StopListening("Victory",     OnVictory);
-        EventManager.StopListening("Defeat",      OnDefeat);
-        EventManager.StopListening("WaveStart",   OnWaveStart);
-        EventManager.StopListening("GoldChanged", OnGoldChanged);
+        EventManager.StopListening("Victory",    OnVictory);
+        EventManager.StopListening("Defeat",     OnDefeat);
+        EventManager.StopListening("WaveStart",  OnWaveStart);
+        EventManager.StopListening("GoldEarned", OnGoldEarned);
     }
 
     private void OnWaveStart(GameObject obj, string param)
@@ -51,10 +66,14 @@ public class GameResultReporter : MonoBehaviour
         }
     }
 
-    private void OnGoldChanged(GameObject obj, string param)
+    // Gold összeadása (minden ellenség után kapott arány)
+    private void OnGoldEarned(GameObject obj, string param)
     {
-        if (int.TryParse(param, out int gold))
-            goldEarned = gold;
+        if (int.TryParse(param, out int earned))
+        {
+            goldEarned += earned;
+            Debug.Log($"💰 GoldEarned: +{earned} → összesen: {goldEarned}");
+        }
     }
 
     private void OnVictory(GameObject obj, string param)
@@ -115,9 +134,14 @@ public class GameResultReporter : MonoBehaviour
         else
             stars = 0;
 
-        Debug.Log($"📊 Meccs vége → Won:{won} | Map:{mapName}(Id:{mapId}) | Wave:{wavesCompleted}/{totalWaves} | {completionPercent}% | ⭐{stars} | Duration:{duration}s | Kills:{kills} | Gold:{goldEarned}");
+        // ── XP kiszámítása: csak győzelem esetén jár ────────────────
+        int xpEarned = won ? GetXpReward(mapName) : 0;
 
-        // 1) RecentGames mentése
+        Debug.Log($"📊 Meccs vége → Won:{won} | Map:{mapName}(Id:{mapId}) | " +
+                  $"Wave:{wavesCompleted}/{totalWaves} | {completionPercent}% | ⭐{stars} | " +
+                  $"Duration:{duration}s | Kills:{kills} | Gold:{goldEarned} | XP:{xpEarned}");
+
+        // 1) RecentGames + PlayerStats frissítése (gold, xp, level)
         yield return StartCoroutine(APIManager.Instance.SaveRecentGame(
             accountId:     accountId,
             mapName:       mapName,
@@ -126,7 +150,17 @@ public class GameResultReporter : MonoBehaviour
             duration:      duration,
             goldEarned:    goldEarned,
             enemiesKilled: kills,
-            xpEarned:      0
+            xpEarned:      xpEarned,
+            onSuccess: () =>
+            {
+                Debug.Log($"✅ SaveRecentGame kész. XP:{xpEarned} | Gold:{goldEarned}");
+
+                // Frissítjük a PlayerStatsManager cache-t hogy az autosave ne nullázza vissza
+                if (PlayerStatsManager.Instance != null && won)
+                {
+                    PlayerStatsManager.Instance.ApplyGameResult(goldEarned, xpEarned);
+                }
+            }
         ));
 
         // 2) MapProgress mentése

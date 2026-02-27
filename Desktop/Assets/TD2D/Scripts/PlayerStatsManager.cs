@@ -208,6 +208,31 @@ public class PlayerStatsManager : MonoBehaviour
     }
 
     // =========================================================
+    // MECCS EREDMÉNY ALKALMAZÁSA
+    // Győzelem után a GameResultReporter hívja meg,
+    // hogy a cache naprakész legyen az autosave előtt.
+    // =========================================================
+    public void ApplyGameResult(int goldEarned, int xpEarned)
+    {
+        cachedTotalGold   += goldEarned;
+        cachedCurrentGold += goldEarned;
+
+        cachedCurrentXp += xpEarned;
+        while (cachedCurrentXp >= cachedNextLevelXp)
+        {
+            cachedCurrentXp  -= cachedNextLevelXp;
+            cachedLevel++;
+            cachedNextLevelXp = cachedLevel * 100;
+            Debug.Log($"🎉 LEVEL UP! → Level {cachedLevel} | NextLevelXp: {cachedNextLevelXp}");
+        }
+
+        Debug.Log($"✅ ApplyGameResult: Gold +{goldEarned} (total:{cachedTotalGold}) | " +
+                  $"XP +{xpEarned} → CurrentXp:{cachedCurrentXp}/{cachedNextLevelXp} | Lv:{cachedLevel}");
+
+        StartCoroutine(PutStats());
+    }
+
+    // =========================================================
     // PUT UPDATE — MINDEN MEZŐT ELKÜLDI
     // =========================================================
     IEnumerator PutStats()
