@@ -173,5 +173,20 @@ public class GameResultReporter : MonoBehaviour
             timeSeconds:       duration,
             completionPercent: completionPercent
         ));
+
+        // 3) Achievement ellenőrzés
+        if (AchievementManager.Instance != null)
+        {
+            // A PlayerStatsManager cache-ből olvassuk a frissített TotalGold és MaxWave értékeket
+            long  totalGold   = PlayerStatsManager.Instance != null ? PlayerStatsManager.Instance.CachedTotalGold   : 0;
+            int   maxWave     = PlayerStatsManager.Instance != null ? PlayerStatsManager.Instance.CachedMaxWaveReached : 0;
+
+            AchievementManager.Instance.CheckAndUnlockAfterGame(
+                accountId:        accountId,
+                won:              won,
+                maxWaveThisGame:  currentWave,
+                totalGold:        totalGold
+            );
+        }
     }
 }

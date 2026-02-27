@@ -80,6 +80,8 @@ public class TowerActionBuild : TowerAction
 			if (tower != null)
 			{
 				tower.BuildTower(towerPrefab);
+				// Achievement nyomkövetés
+				EventManager.TriggerEvent("TowerBuilt", null, null);
 			}
 		}
 	}

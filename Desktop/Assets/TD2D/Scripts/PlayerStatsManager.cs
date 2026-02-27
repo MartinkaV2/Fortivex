@@ -25,6 +25,10 @@ public class PlayerStatsManager : MonoBehaviour
     private long cachedCurrentGold = 0;
     private int cachedMaxWave      = 0;
 
+    // ===== PUBLIKUS OLVASHATÓ ÉRTÉKEK (AchievementManager számára) =====
+    public long CachedTotalGold      => cachedTotalGold;
+    public int  CachedMaxWaveReached => cachedMaxWave;
+
     private float timerBuffer    = 0f;
     private bool isTracking      = false;
     private bool autoSaveRunning = false;
