@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using System;
 using System.Text;
 using System.Collections;
@@ -21,6 +22,50 @@ public class AuthUIManager : MonoBehaviour
     {
         if (registerButton != null) registerButton.onClick.AddListener(OnRegisterClick);
         if (loginButton != null) loginButton.onClick.AddListener(OnLoginClick);
+
+        // Enter/Tab navigáció beállítása
+        SetupInputNavigation();
+    }
+
+    private void SetupInputNavigation()
+    {
+        // === REGISTER SCENE: Username → Email → Password → Register ===
+        if (usernameInput != null && emailInput != null && passwordInput != null)
+        {
+            // Username → Email
+            usernameInput.onSubmit.AddListener((_) => FocusField(emailInput));
+
+            // Email → Password
+            emailInput.onSubmit.AddListener((_) => FocusField(passwordInput));
+
+            // Password → Register gomb (ha van), különben Login
+            passwordInput.onSubmit.AddListener((_) => {
+                if (registerButton != null && registerButton.gameObject.activeInHierarchy)
+                    OnRegisterClick();
+                else if (loginButton != null)
+                    OnLoginClick();
+            });
+        }
+        // === LOGIN SCENE: Username → Password → Login ===
+        else if (usernameInput != null && passwordInput != null)
+        {
+            // Username → Password
+            usernameInput.onSubmit.AddListener((_) => FocusField(passwordInput));
+
+            // Password → Login
+            passwordInput.onSubmit.AddListener((_) => {
+                if (loginButton != null)
+                    OnLoginClick();
+            });
+        }
+    }
+
+    private void FocusField(TMP_InputField field)
+    {
+        if (field == null) return;
+        EventSystem.current.SetSelectedGameObject(field.gameObject);
+        field.ActivateInputField();
+        field.MoveTextEnd(false);
     }
 
     public void OnRegisterClick()
@@ -182,7 +227,6 @@ public class AuthUIManager : MonoBehaviour
                 PlayerPrefs.Save();
                 Debug.Log("✅ AccountId elmentve: " + accountId);
                 
-                // --- ITT AZ ÚJ RÉSZ ---
                 // Statisztika kezelő inicializálása és mérés indítása
                 if (PlayerStatsManager.Instance != null)
                 {
@@ -193,7 +237,6 @@ public class AuthUIManager : MonoBehaviour
                 {
                     Debug.LogWarning("⚠️ PlayerStatsManager nincs a Scene-ben, a mérés nem indult el!");
                 }
-                // ---------------------
 
                 statusText.text = "Sikeres bejelentkezés!";
                 Invoke("LoadMainMenu", 1f);
