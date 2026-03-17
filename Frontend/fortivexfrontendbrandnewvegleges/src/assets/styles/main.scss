@@ -1,0 +1,472 @@
+// src/assets/styles/main.scss
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import './variables.scss';
+
+// Global Reset
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// Root Styles
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: 14px;
+  }
+}
+
+body {
+  font-family: $font-primary;
+  background: $primary-bg;
+  color: $text-primary;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// App Container
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-display;
+  color: $gold;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: $font-size-3xl;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-2xl;
+  }
+}
+
+h2 {
+  font-size: $font-size-2xl;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-xl;
+  }
+}
+
+h3 {
+  font-size: $font-size-xl;
+}
+
+h4 {
+  font-size: $font-size-lg;
+}
+
+p {
+  margin-bottom: $spacing-md;
+}
+
+a {
+  color: $gold;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $gold-light;
+  }
+}
+
+// Links
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+// Buttons
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Inputs
+input,
+textarea,
+select {
+  &:focus {
+    outline: none;
+  }
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: $primary-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $primary-border;
+  border-radius: $radius-sm;
+  border: 2px solid $primary-bg;
+
+  &:hover {
+    background: $secondary-border;
+  }
+}
+
+// Selection
+::selection {
+  background: rgba($gold, 0.3);
+  color: $gold;
+}
+
+::-moz-selection {
+  background: rgba($gold, 0.3);
+  color: $gold;
+}
+
+// Utility Classes
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 0 $spacing-lg;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-gold {
+  color: $gold;
+}
+
+.text-muted {
+  color: $text-secondary;
+}
+
+.font-display {
+  font-family: $font-display;
+}
+
+// Flexbox Utilities
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-sm {
+  gap: $spacing-sm;
+}
+
+.gap-md {
+  gap: $spacing-md;
+}
+
+.gap-lg {
+  gap: $spacing-lg;
+}
+
+// Margin & Padding Utilities
+.mt-sm {
+  margin-top: $spacing-sm;
+}
+.mt-md {
+  margin-top: $spacing-md;
+}
+.mt-lg {
+  margin-top: $spacing-lg;
+}
+.mt-xl {
+  margin-top: $spacing-xl;
+}
+
+.mb-sm {
+  margin-bottom: $spacing-sm;
+}
+.mb-md {
+  margin-bottom: $spacing-md;
+}
+.mb-lg {
+  margin-bottom: $spacing-lg;
+}
+.mb-xl {
+  margin-bottom: $spacing-xl;
+}
+
+.p-sm {
+  padding: $spacing-sm;
+}
+.p-md {
+  padding: $spacing-md;
+}
+.p-lg {
+  padding: $spacing-lg;
+}
+.p-xl {
+  padding: $spacing-xl;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+// Animation Classes
+.fade-in {
+  animation: fadeIn $transition-base;
+}
+
+.fade-in-up {
+  animation: fadeInUp $transition-base;
+}
+
+.fade-in-down {
+  animation: fadeInDown $transition-base;
+}
+
+.slide-in-left {
+  animation: slideInLeft $transition-base;
+}
+
+.slide-in-right {
+  animation: slideInRight $transition-base;
+}
+
+// Card Component
+.card {
+  @include card;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-5px);
+    border-color: $gold;
+    box-shadow: 0 10px 30px rgba($gold, 0.3);
+  }
+}
+
+// Button Components
+.btn {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-primary;
+  background: transparent;
+  color: $gold;
+
+  &:hover {
+    background: rgba($gold, 0.1);
+  }
+}
+
+.btn-danger {
+  @include button-primary;
+  background: $error;
+  border-color: $error;
+
+  &:hover {
+    background: $error-light;
+  }
+}
+
+.btn-success {
+  @include button-primary;
+  background: $success;
+  border-color: $success;
+
+  &:hover {
+    background: $success-light;
+  }
+}
+
+// Loading State
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  @include flex-center;
+  z-index: $z-modal;
+}
+
+// Error & Success Messages
+.message {
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+
+  &.error {
+    background: rgba($error, 0.2);
+    border: 2px solid $error;
+    color: $error-light;
+  }
+
+  &.success {
+    background: rgba($success, 0.2);
+    border: 2px solid $success;
+    color: $success-light;
+  }
+
+  &.warning {
+    background: rgba($warning, 0.2);
+    border: 2px solid $warning;
+    color: $warning-light;
+  }
+
+  &.info {
+    background: rgba($info, 0.2);
+    border: 2px solid $info;
+    color: $info-light;
+  }
+}
+
+// Responsive Utilities
+.hide-mobile {
+  @media (max-width: $breakpoint-md) {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @media (min-width: $breakpoint-md-plus) {
+    display: none !important;
+  }
+}
+
+// Print Styles
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
