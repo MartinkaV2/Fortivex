@@ -1,48 +1,54 @@
-FortivexAPI Tesztelési Dokumentáció
-Ez a mappa tartalmazza a FortivexAPI backend szolgáltatásaihoz készült automatizált teszteket. A projekt három különböző tesztelési megközelítést alkalmaz a maximális megbízhatóság érdekében.
+# FortivexAPI – Backend Tesztelési Dokumentáció
 
-Alkalmazott Tesztkeretrendszerek
-xUnit: A kontroller logika és az üzleti folyamatok egységtesztelésére (Unit Test) szolgál.
+Ez a modul a **Fortivex** ökoszisztéma backend szolgáltatásaihoz készült automatizált teszteseteket tartalmazza. A rendszer stabilitását és az adatok integritását három különböző tesztelési metodika együttes alkalmazása garantálja.
 
-MSTest: A Microsoft hivatalos tesztkeretrendszere, amely kiegészítő ellenőrzéseket végez a hitelesítési folyamatokon.
+## 🛠 Alkalmazott Technológiai Stack
 
-API (Integrációs) Teszt: A WebApplicationFactory segítségével a teljes HTTP kérésciklust teszteli az útvonalaktól (Routing) a JSON válaszokig.
+A projekt a .NET ökoszisztéma legmodernebb tesztelési eszközeit használja:
 
-Tesztelt Funkciók (AccountsController)
-A tesztek az alábbi végpontok és funkciók helyes működését igazolják:
+*   **xUnit**: A kontroller logika és az alapvető üzleti folyamatok izolált egységtesztelésére (`Unit Test`).
+*   **MSTest**: A Microsoft hivatalos keretrendszere, amely a hitelesítési réteg (`Authentication`) és a biztonsági protokollok validálásáért felel.
+*   **Integrációs Tesztek**: A `WebApplicationFactory` osztály segítségével a teljes HTTP kérés-válasz ciklus tesztelésre kerül a routingtól kezdve a JSON deszerializációig.
 
-Fiókok listázása: Az összes regisztrált felhasználó lekérése.
+## 🔍 Tesztelt Funkciók (AccountsController)
 
-Egyedi lekérdezés: Fiók keresése azonosító alapján (létező és nem létező ID esetén).
+A tesztelési lefedettség az `AccountsController` összes kritikus végpontjára kiterjed:
 
-Regisztráció: Új felhasználók létrehozása, szerepkörök (User/Admin) kezelése és adatbázisba mentés.
+| Funkció | Leírás |
+| :--- | :--- |
+| **Fiókok listázása** | A regisztrált felhasználók biztonságos lekérdezésének ellenőrzése. |
+| **Egyedi lekérdezés** | Fiók keresése azonosító alapján, beleértve a `NotFound` (404) hibakezelést is. |
+| **Regisztráció** | Új entitások létrehozása, szerepkör-hozzárendelés és adatbázis-perzisztencia. |
+| **Bejelentkezés** | Hitelesítési folyamat validálása és érvényes `JWT` token generálásának ellenőrzése. |
+| **Törlés** | Felhasználói profilok végleges és biztonságos eltávolítása a rendszerből. |
 
-Bejelentkezés (Login): Felhasználónév és jelszó ellenőrzése, JWT token generálás.
+## 📊 Tesztelési Statisztikák
 
-Törlés: Felhasználói fiókok eltávolítása a rendszerből.
+Az utolsó futtatás eredményei alapján a backend réteg **100%-os sikerességi rátával** rendelkezik:
 
-Tesztelési Eredmények
-Összes teszteset: 7
+*   **Összes teszteset:** 7
+*   **Sikeres:** 7
+*   **Sikertelen:** 0
+*   **Állapot:** ![Pass](https://img.shields.io/badge/Tests-7%2F7%20Passed-brightgreen)
 
-Sikeres: 7
+## 🏗 Tesztkörnyezet és Izoláció
 
-Sikertelen: 0
+A tesztek futtatása teljesen önfenntartó, nincs szükség külső adatbázis-szerverre:
 
-Lefedettség: A kritikus backend üzleti logika teljes körűen lefedve.
+1.  **InMemory Database**: Az `Entity Framework Core` memóriabeli adatbázis-megoldását használjuk, ami extrém gyors futást tesz lehetővé.
+2.  **Adatizoláció**: Minden egyes teszteset egy teljesen új, tiszta adatbázis-kontextust kap, így a tesztek nem befolyásolják egymás eredményeit.
+3.  **Automatikus Seed**: A rendszer induláskor automatikusan feltölti a szükséges tesztadatokat (pl. `testplayer` profil), biztosítva a reprodukálható környezetet.
 
-Tesztkörnyezet és Adatbázis
-A tesztek futtatásához nincs szükség külső adatbázis-kapcsolatra.
+## 🚀 Futtatási Útmutató
 
-InMemory Database: A tesztek az Entity Framework Core UseInMemoryDatabase megoldását használják.
+### Visual Studio használatával:
+1. Nyissa meg a `FortivexAPI.sln` projektfájlt.
+2. A felső menüsorban válassza a **Test** -> **Test Explorer** menüpontot.
+3. Kattintson a **Run All Tests** gombra.
 
-Izoláció: Minden tesztfuttatás saját, egyedi nevű memóriabeli adatbázist kap, így a tesztek nem módosítják egymás adatait.
-
-Seed adatok: A tesztkörnyezet induláskor automatikusan feltölti az alapvető tesztadatokat (pl. testplayer).
-
-Futtatási útmutató
-Visual Studio használatával:
-Nyisd meg a FortivexAPI.sln fájlt.
-
-Navigálj a felső menüsorban a Test -> Test Explorer ablakhoz.
+### .NET CLI használatával:
+Futtassa az alábbi parancsot a projekt gyökérkönyvtárában:
+```bash
+dotnet test
 
 Kattintson a Run All Tests gombra.
